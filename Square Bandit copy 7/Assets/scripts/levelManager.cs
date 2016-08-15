@@ -104,4 +104,8 @@ public class levelManager : MonoBehaviour {
 	{
 		SceneManager.LoadScene("levelScene");
 	}
+
+	public void Play(){
+		Pause ();
+	}
 }

@@ -23,6 +23,7 @@ public class levelManager : MonoBehaviour {
 
 	bool dead = false;
 
+	public GameObject mainMenuPanel;
 	public GameObject gameOverPanel;
 
 	public SpriteRenderer Sky;
@@ -31,10 +32,35 @@ public class levelManager : MonoBehaviour {
 
 	public int score;
 	public Text scoreDisplay;
+	public Text gameOverScoreDisplay;
+
+	public bool gameStarted = false;
+
+	Vector3 cameraStartPos = new Vector3(0, 1,-10);
+	Vector3 pcStartPos = new Vector3(0, -23.1f,0);
+	Vector3 startPlatformStartPos = new Vector3(0, -35.1f,0);
+	public GameObject startPlatform;
+	public GameObject startPlatformHolder;
+	public GameObject pc;
+	public camControl camScript;
+	pcControl pcScript;
+	public stageMaker stageMakerScript;
+	Vector3 lastPcPoint =  new Vector3(0,500,0);
+	Vector3 eraserTargetPos = new Vector3(0,500,0);
+	public Transform eraser;
+	float eraserSpeed = 20;
+	public CanvasGroup mainMenuGroup;
+	public CanvasGroup InGameGroup;
+	public CanvasGroup gameOverGroup;
+
+
+	float fadeTime = 2;
 
 	void Start () 
 	{
 //		InvokeRepeating( "ColorCheck", 0.5f, 0.5f);
+		pcScript = pc.GetComponent<pcControl>();
+		transistionCanvas.instance.StartTransitionOut();
 	}
 	
 	// Update is called once per frame
@@ -67,7 +93,6 @@ public class levelManager : MonoBehaviour {
 	{
 //		Sky.color = Color.Lerp(Sky.color, skyColors[skyColorIndex], 0.02f*Time.deltaTime);
 
-
 	}
 
 	void ColorCheck()
@@ -92,20 +117,175 @@ public class levelManager : MonoBehaviour {
 	{
 		score += scoreAmount;
 		scoreDisplay.text = score.ToString();
+		gameOverScoreDisplay.text = scoreDisplay.text;
+	}
+
+
+	public void Play()
+	{
+		if(gameStarted)
+		{
+			StartOver();
+		}
+		else
+		{
+			NewStart();
+		}
+	}
+
+	public void NewStart()
+	{
+		pcScript.gameStarted = true;
+		mainMenuGroup.interactable = false;
+		InvokeRepeating("FadeOut",0.01f, 0.02f);
+		InvokeRepeating("InGameUIFadeIn",0.01f, 0.02f);
+
+		/*
+		 * logic:
+		 * animate buttons out
+		 * enable input + pause button
+		 * 
+		 */
+	}
+
+	public void StartOver()
+	{
+		transistionCanvas.instance.StartTransitionIn(Load);
+//		PlayerPrefs.SetInt("restarting",1);
+
+		/*
+		 * logic:
+		 * reset camera
+		 * instantiate start platform
+		 * reset pc
+		 * reset stagemanager
+		 */
+
+//		gameOverPanel.SetActive(false);
+//		dead = false;
+//		pcScript.dead = false;
+//
+//		if(startPlatformHolder != null)
+//			Destroy(startPlatformHolder);
+//		
+//		StartCoroutine( Resets() );
+
+	
+
 	}
 
 	public void GameOver()
 	{
 		dead = true;
-		gameOverPanel.SetActive(true);
+		pc.SetActive(false);
+		lastPcPoint = pc.transform.position;
+		StartCoroutine( FadeDelay() );
+
+
 	}
 
-	public void StartOver()
+	IEnumerator FadeDelay()
+	{
+		yield return new WaitForSeconds(0.5f);
+		InvokeRepeating("InGameUIFadeOut",0.01f, 0.02f);
+		InvokeRepeating("GameOverUIFadeIn",0.01f, 0.02f);
+
+	}
+
+	public void Load()
 	{
 		SceneManager.LoadScene("levelScene");
 	}
 
-	public void Play(){
-		Pause ();
+	void FadeOut()
+	{
+		if(mainMenuGroup.alpha > 0)
+		{
+			mainMenuGroup.alpha -=Time.deltaTime*fadeTime;
+			if(mainMenuGroup.alpha <= 0) 
+			{
+				mainMenuPanel.SetActive(false);
+				CancelInvoke("FadeOut");
+			}
+		}
 	}
+
+	void GameOverUIFadeIn()
+	{
+		if(gameOverGroup.interactable == false)gameOverGroup.interactable = true;
+		if(gameOverGroup.alpha < 1)
+		{
+			gameOverGroup.alpha +=Time.deltaTime*fadeTime;
+			if(gameOverGroup.alpha >= 1) 
+			{
+				
+				gameOverGroup.blocksRaycasts = true;
+				CancelInvoke("GameOverUIFadeIn");
+			}
+		}
+	}
+
+	void InGameUIFadeOut()
+	{
+		if(InGameGroup.alpha > 0)
+		{
+			InGameGroup.alpha -=Time.deltaTime*fadeTime;
+			if(InGameGroup.alpha <= 0) 
+			{
+				print("fac");
+				InGameGroup.interactable = false;
+				InGameGroup.blocksRaycasts = false;
+				CancelInvoke("InGameUIFadeOut");
+			}
+		}
+	}
+
+	void InGameUIFadeIn()
+	{
+		if(InGameGroup.alpha < 1)
+		{
+			InGameGroup.alpha +=Time.deltaTime*fadeTime;
+			if(InGameGroup.alpha >= 1) 
+			{
+				print("fac1");
+				InGameGroup.interactable = true;
+				InGameGroup.blocksRaycasts = true;
+				CancelInvoke("InGameUIFadeIn");
+			}
+		}
+	}
+
+//	IEnumerator Resets()
+//	{
+//		RunEraser();
+//		yield return new WaitForSeconds(2);
+//		startPlatformHolder = Instantiate(startPlatform, startPlatformStartPos, startPlatform.transform.rotation) as GameObject;
+//		stageMakerScript.Reset();
+//
+//		pc.transform.position = pcStartPos;
+//		pc.SetActive(true);
+//		camScript.targetPos = cameraStartPos;
+//	}
+
+//	void RunEraser()
+//	{
+//		print("aw");
+//		eraser.position = new Vector3(0, -15, 0);
+//		eraserTargetPos.y = lastPcPoint.y + 200;
+//		eraser.gameObject.SetActive(true);
+//		InvokeRepeating("MoveEraser", 0.1f, 0.02f);
+//	}
+//
+//	void MoveEraser()
+//	{
+//		if(eraser.gameObject.activeSelf)
+//			eraser.position = Vector3.MoveTowards(eraser.position, eraserTargetPos, eraserSpeed*Time.deltaTime);
+//		if(eraserTargetPos.y - eraser.position.y < 10)
+//		{
+//			CancelInvoke("MoveEraser");
+//			eraser.gameObject.SetActive(false); 
+//		}
+//	}
+
+
 }

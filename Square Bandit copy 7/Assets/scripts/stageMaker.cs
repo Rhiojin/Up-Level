@@ -38,7 +38,9 @@ public class stageMaker : MonoBehaviour {
 	int randomizer = 0;
 	bool longSpawn = false;
 
-
+	Vector3 originalSpawnPoint;
+	Vector3 originalGroundSpawnPoint;
+	Vector3 originalAirSpawnPoint;
 
 
 
@@ -46,6 +48,10 @@ public class stageMaker : MonoBehaviour {
 	{
 		//spawnPoint.x = Random.Range(-xRange, xRange);
 //		Instantiate(platform, spawnPoint, platform.transform.rotation);
+
+		originalSpawnPoint = spawnPoint;
+		originalGroundSpawnPoint = groundHazardSpawnPoint;
+		originalAirSpawnPoint = airHazardSpawnPoint;
 
 		InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
 		InvokeRepeating("SpawnLight", 0.1f, 0.1f);
@@ -55,6 +61,15 @@ public class stageMaker : MonoBehaviour {
 	void Update () {
 	
 	
+	}
+
+	public void Reset()
+	{
+		spawnPoint = originalSpawnPoint;
+		groundHazardSpawnPoint = originalGroundSpawnPoint;
+		airHazardSpawnPoint = originalAirSpawnPoint;
+		lightCount = 0;
+		floorCount = 0;
 	}
 
 	void SpawnPlatform()
@@ -230,7 +245,7 @@ public class stageMaker : MonoBehaviour {
 //			Destroy(trig.transform.parent.gameObject);
 //			floorCount-=2;
 //		}
-		else
+		else if(!trig.CompareTag("eraser"))
 		{
 			Destroy(trig.transform.gameObject);
 		}
@@ -242,6 +257,7 @@ public class stageMaker : MonoBehaviour {
 	{
 //		if(col.collider.CompareTag("trashTrigger"))
 //		{
+		if(!col.collider.CompareTag("eraser"))
 			Destroy(col.gameObject);
 
 //		}

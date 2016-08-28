@@ -43,7 +43,7 @@ public class enemy1 : MonoBehaviour {
 
 		if(transform.position.x > rightBounds.x+boundsEase) 
 		{
-			transform.position = new Vector3(leftBounds.x-boundsEase, transform.position.y, transform.position.z);
+			transform.position = new Vector3(leftBounds.x, transform.position.y, transform.position.z);
 		}
 
 		if(transform.position.x < leftBounds.x-boundsEase) 

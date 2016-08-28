@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class pcControl : MonoBehaviour {
 
@@ -39,6 +40,8 @@ public class pcControl : MonoBehaviour {
 	public levelManager levelScript;
 	public camControl camScript;
 	public bool dead = false;
+	public bool gameStarted = false;
+
 
 	public Transform pcShadow;
 	public SpriteRenderer pcShadowRenderer;
@@ -62,6 +65,20 @@ public class pcControl : MonoBehaviour {
 	Vector2 touchCurrent = Vector2.zero;
 	Vector2 swipeDistance = Vector2.zero;
 
+	public SpriteRenderer hat;
+	public SpriteRenderer body;
+	public SpriteRenderer face;
+	public SpriteRenderer armsL;
+	public SpriteRenderer armsR;
+	public SpriteRenderer handsL;
+	public SpriteRenderer handsR;
+	public SpriteRenderer legsL;
+	public SpriteRenderer legsR;
+	public ParticleSystem particleRocket;
+	public ParticleSystem particleStomp;
+	public ParticleSystem particleBreak;
+
+
 
 	void Start () 
 	{
@@ -82,6 +99,8 @@ public class pcControl : MonoBehaviour {
 		trail.sortingLayerName = "pc";
 		trail.enabled = false;
 
+		LoadCharacterSkin();
+
 	}
 	
 	// Update is called once per frame
@@ -92,14 +111,54 @@ public class pcControl : MonoBehaviour {
 //		if(!RocketBoosting && !ButtStomping)
 //		{
 			if(!donkeyCannoning) Move();
+			else FreezePosition();
 //		}
 
-			GetInput();
+			if(gameStarted)GetInput();
 		}
 		 
+		BoundsReposition();
 		CastShadow();
 	}
 
+	void LoadCharacterSkin()
+	{
+		//pull character art from sprite sheet. Assigned in order of appearance
+		string pathPrefix = "Skins/upLevel-character-";
+		string skinName = PlayerPrefs.GetString("selectedSkin","boxer");
+		string fullPath = pathPrefix+skinName;
+//		fullPath = "upLevel-character-viking";
+		Sprite[] skinData = Resources.LoadAll<Sprite>(fullPath);
+
+		body.sprite = skinData[0];
+		hat.sprite = skinData[1];
+		armsL.sprite = skinData[2];
+		armsR.sprite = skinData[2];
+
+		particleRocket.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[3]);
+		particleBreak.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[3]);
+
+		legsL.sprite = skinData[4];
+		legsR.sprite = skinData[4];
+
+		face.sprite = skinData[5];
+		handsL.sprite = skinData[6];
+		handsR.sprite = skinData[6];
+
+		particleStomp.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[7]);
+
+	}
+
+	Texture2D TextureFromSprite(Sprite sprite)
+	{
+//		Texture2D newTex = new Texture2D((int)sprite.rect.width,(int)sprite.rect.height);
+		Texture2D newTex = new Texture2D((int)sprite.textureRect.width,(int)sprite.textureRect.height);
+
+		Color[] newColors = sprite.texture.GetPixels((int)sprite.textureRect.x,(int)sprite.textureRect.y,(int)sprite.textureRect.width,(int)sprite.textureRect.height);
+		newTex.SetPixels(newColors);
+		newTex.Apply();
+		return newTex;
+	}
 
 	public void Pause()
 	{
@@ -237,10 +296,15 @@ public class pcControl : MonoBehaviour {
 //			transform.position = new Vector3(xRange-1, transform.position.y, transform.position.z);
 //		}
 
+
+	}
+
+	void BoundsReposition()
+	{
 		if(transform.position.x > rightBounds.x+boundsEase) 
 		{
 			if(!togglingTrail && trail.enabled) StartCoroutine( ToggleTrail() );
-			transform.position = new Vector3(leftBounds.x-boundsEase, transform.position.y, transform.position.z);
+			transform.position = new Vector3(leftBounds.x, transform.position.y, transform.position.z);
 
 		}
 
@@ -249,6 +313,11 @@ public class pcControl : MonoBehaviour {
 			if(!togglingTrail && trail.enabled) StartCoroutine( ToggleTrail() );
 			transform.position = new Vector3(rightBounds.x+boundsEase, transform.position.y, transform.position.z);
 		}
+	}
+
+	void FreezePosition()
+	{
+		transform.position = cannon.position;
 	}
 
 	IEnumerator ToggleTrail()
@@ -314,7 +383,7 @@ public class pcControl : MonoBehaviour {
 		anim.Play("pc_RocketBoost");
 		RocketBoosting = true;
 		 
-		rocketParticle.Emit(5);
+		rocketParticle.Play();
 
 		thisRigidbody.velocity = zeroVector;
 		thisRigidbody.AddForce(upVector*boostForce);
@@ -322,6 +391,7 @@ public class pcControl : MonoBehaviour {
 		yield return new WaitForSeconds(1);
 //		anim.Play("pc_Jump");
 		trail.enabled = false;
+		rocketParticle.Stop();
 		//thisCollider.isTrigger = false;
 		//RocketBoosting = false;
 	}
@@ -347,10 +417,12 @@ public class pcControl : MonoBehaviour {
 
 	void EnterDonkeyCannon()
 	{
+		donkeyCannoning = true;
 		thisRigidbody.gravityScale = 0;
 		thisRigidbody.velocity = zeroVector;
-		donkeyCannoning = true;
+
 		breakParticle.Emit(10);
+		breakParticle.Stop();
 //		thisBody.SetActive(false);
 		transform.position = cannon.position;
 //		anim.Play("pc_DonkeyCannon");
@@ -371,6 +443,7 @@ public class pcControl : MonoBehaviour {
 		cannonCollider.enabled = true;
 
 		yield return new WaitForSeconds(1.7f);
+
 		rocketParticle.Stop();
 		RocketBoosting = false;
 //		anim.Play("pc_Jump");
@@ -428,7 +501,11 @@ public class pcControl : MonoBehaviour {
 			canJump = true;
 			RocketBoosting = false;
 			//rocketParticle.Stop();
-			if(ButtStomping) stompParticle.Emit(5);
+			if(ButtStomping) 
+			{
+				stompParticle.Emit(5);
+				stompParticle.Stop();	
+			}
 			ButtStomping = false;
 
 		}
@@ -445,12 +522,14 @@ public class pcControl : MonoBehaviour {
 				{
 					camScript.StartCamRock(transform.position.x);
 					stompParticle.Emit(5);
+					stompParticle.Stop();	
 
 				}
 				else if(RocketBoosting)
 				{
 					camScript.StartScreenShake();
 					breakParticle.Emit(5);
+					breakParticle.Stop();
 				}
 				ButtStomping = false;
 				//RocketBoosting = false;
@@ -463,6 +542,7 @@ public class pcControl : MonoBehaviour {
 			else 
 			{
 				breakParticle.Emit(15);
+				breakParticle.Stop();
 				Death();
 			}
 		}
@@ -470,6 +550,7 @@ public class pcControl : MonoBehaviour {
 		if(colEnt.collider.CompareTag("hazard"))
 		{
 			breakParticle.Emit(15);
+			breakParticle.Stop();
 			Death();
 		}
 
@@ -485,6 +566,7 @@ public class pcControl : MonoBehaviour {
 				thisRigidbody.AddForce(upVector*jumpForce);
 				camScript.StartCamRock(transform.position.x);
 				stompParticle.Emit(5);
+				stompParticle.Stop();
 			}
 
 			if(RocketBoosting)
@@ -498,6 +580,7 @@ public class pcControl : MonoBehaviour {
 				trail.enabled = false;
 //				thisRigidbody.AddForce(-upVector*jumpForce);
 				breakParticle.Emit(5);
+				breakParticle.Stop();
 			}
 
 			if(!canJump)

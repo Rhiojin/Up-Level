@@ -5,11 +5,11 @@ public class camControl : MonoBehaviour {
 
 	public Transform target;
 //	public Rigidbody2D targetRigidbody;
-	Vector3 targetPos;
+	public Vector3 targetPos;
 //	float minHeight = 3f;
 //	float maxHeight = 20;
 	float lerpSpeed = 2;
-	float yOffset = 9;
+	float yOffset = 8;
 	float xClamp = 8; //was 20
 
 //	float baseOrthoSize = 7.5f;
@@ -94,7 +94,7 @@ public class camControl : MonoBehaviour {
 
 	void PlayerDied()
 	{
-		target = null;
+//		target = null;
 	}
 
 	public void StartScreenShake()

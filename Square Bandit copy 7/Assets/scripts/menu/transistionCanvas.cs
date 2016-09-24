@@ -99,4 +99,9 @@ public class transistionCanvas : MonoBehaviour {
 		ballImage.anchoredPosition +=ballTravelArc*Time.deltaTime;
 		ballTravelArc.y -= gravity;
 	}
+
+	public void ChangeImage(Sprite newImage)
+	{
+		ballImage.GetComponent<Image>().sprite = newImage;
+	}
 }

@@ -52,6 +52,7 @@ public class levelManager : MonoBehaviour {
 	public CanvasGroup mainMenuGroup;
 	public CanvasGroup InGameGroup;
 	public CanvasGroup gameOverGroup;
+	public MenuManager menuScript;
 
 
 	float fadeTime = 2;
@@ -121,139 +122,118 @@ public class levelManager : MonoBehaviour {
 	}
 
 
-	public void Play()
-	{
-		if(gameStarted)
-		{
-			StartOver();
-		}
-		else
-		{
-			NewStart();
-		}
-	}
-
-	public void NewStart()
-	{
-		pcScript.gameStarted = true;
-		mainMenuGroup.interactable = false;
-		InvokeRepeating("FadeOut",0.01f, 0.02f);
-		InvokeRepeating("InGameUIFadeIn",0.01f, 0.02f);
-
-		/*
-		 * logic:
-		 * animate buttons out
-		 * enable input + pause button
-		 * 
-		 */
-	}
-
-	public void StartOver()
-	{
-		transistionCanvas.instance.StartTransitionIn(Load);
-//		PlayerPrefs.SetInt("restarting",1);
-
-		/*
-		 * logic:
-		 * reset camera
-		 * instantiate start platform
-		 * reset pc
-		 * reset stagemanager
-		 */
-
-//		gameOverPanel.SetActive(false);
-//		dead = false;
-//		pcScript.dead = false;
+//	public void Play()
+//	{
+//		if(gameStarted)
+//		{
+//			StartOver();
+//		}
+//		else
+//		{
+//			NewStart();
+//		}
+//	}
 //
-//		if(startPlatformHolder != null)
-//			Destroy(startPlatformHolder);
-//		
-//		StartCoroutine( Resets() );
-
-	
-
-	}
-
+//	public void NewStart()
+//	{
+//		pcScript.gameStarted = true;
+//		mainMenuGroup.interactable = false;
+//		InvokeRepeating("FadeOut",0.01f, 0.02f);
+//		InvokeRepeating("InGameUIFadeIn",0.01f, 0.02f);
+//
+//		/*
+//		 * logic:
+//		 * animate buttons out
+//		 * enable input + pause button
+//		 * 
+//		 */
+//	}
+//
+//	public void StartOver()
+//	{
+//		transistionCanvas.instance.StartTransitionIn(Load);
+//	}
+//
 	public void GameOver()
 	{
 		dead = true;
 		pc.SetActive(false);
 		lastPcPoint = pc.transform.position;
-		StartCoroutine( FadeDelay() );
+		StartCoroutine( menuScript.FadeDelay() );
 
 
 	}
-
-	IEnumerator FadeDelay()
-	{
-		yield return new WaitForSeconds(0.5f);
-		InvokeRepeating("InGameUIFadeOut",0.01f, 0.02f);
-		InvokeRepeating("GameOverUIFadeIn",0.01f, 0.02f);
-
-	}
-
-	public void Load()
-	{
-		SceneManager.LoadScene("levelScene");
-	}
-
-	void FadeOut()
-	{
-		if(mainMenuGroup.alpha > 0)
-		{
-			mainMenuGroup.alpha -=Time.deltaTime*fadeTime;
-			if(mainMenuGroup.alpha <= 0) 
-			{
-				mainMenuPanel.SetActive(false);
-				CancelInvoke("FadeOut");
-			}
-		}
-	}
-
-	void GameOverUIFadeIn()
-	{
-		if(gameOverGroup.interactable == false)gameOverGroup.interactable = true;
-		if(gameOverGroup.alpha < 1)
-		{
-			gameOverGroup.alpha +=Time.deltaTime*fadeTime;
-			if(gameOverGroup.alpha >= 1) 
-			{
-				
-				gameOverGroup.blocksRaycasts = true;
-				CancelInvoke("GameOverUIFadeIn");
-			}
-		}
-	}
-
-	void InGameUIFadeOut()
-	{
-		if(InGameGroup.alpha > 0)
-		{
-			InGameGroup.alpha -=Time.deltaTime*fadeTime;
-			if(InGameGroup.alpha <= 0) 
-			{
-				print("fac");
-				InGameGroup.interactable = false;
-				InGameGroup.blocksRaycasts = false;
-				CancelInvoke("InGameUIFadeOut");
-			}
-		}
-	}
-
-	void InGameUIFadeIn()
-	{
-		if(InGameGroup.alpha < 1)
-		{
-			InGameGroup.alpha +=Time.deltaTime*fadeTime;
-			if(InGameGroup.alpha >= 1) 
-			{
-				print("fac1");
-				InGameGroup.interactable = true;
-				InGameGroup.blocksRaycasts = true;
-				CancelInvoke("InGameUIFadeIn");
-			}
-		}
-	}
+//
+//	IEnumerator FadeDelay()
+//	{
+//		yield return new WaitForSeconds(0.5f);
+//		InvokeRepeating("InGameUIFadeOut",0.01f, 0.02f);
+//		InvokeRepeating("GameOverUIFadeIn",0.01f, 0.02f);
+//
+//	}
+//
+//	public void Load()
+//	{
+//		SceneManager.LoadScene("levelScene");
+//	}
+//
+//	void FadeOut()
+//	{
+//		if(mainMenuGroup.alpha > 0)
+//		{
+//			mainMenuGroup.alpha -=Time.deltaTime*fadeTime;
+//			if(mainMenuGroup.alpha <= 0) 
+//			{
+//				mainMenuPanel.SetActive(false);
+//				CancelInvoke("FadeOut");
+//			}
+//		}
+//	}
+//
+//	void GameOverUIFadeIn()
+//	{
+//		if(gameOverGroup.interactable == false)gameOverGroup.interactable = true;
+//		if(gameOverGroup.alpha < 1)
+//		{
+//			gameOverGroup.alpha +=Time.deltaTime*fadeTime;
+//			if(gameOverGroup.alpha >= 1) 
+//			{
+//				
+//				gameOverGroup.blocksRaycasts = true;
+//				CancelInvoke("GameOverUIFadeIn");
+//			}
+//		}
+//	}
+//
+//	void InGameUIFadeOut()
+//	{
+//		if(InGameGroup.alpha > 0)
+//		{
+//			InGameGroup.alpha -=Time.deltaTime*fadeTime;
+//			if(InGameGroup.alpha <= 0) 
+//			{
+//				print("fac");
+//				InGameGroup.interactable = false;
+//				InGameGroup.blocksRaycasts = false;
+//				CancelInvoke("InGameUIFadeOut");
+//			}
+//		}
+//	}
+//
+//	void InGameUIFadeIn()
+//	{
+//		if(InGameGroup.alpha < 1)
+//		{
+//			InGameGroup.alpha +=Time.deltaTime*fadeTime;
+//			if(InGameGroup.alpha >= 1) 
+//			{
+//				print("fac1");
+//				InGameGroup.interactable = true;
+//				InGameGroup.blocksRaycasts = true;
+//				CancelInvoke("InGameUIFadeIn");
+//			}
+//		}
+//	}
 
 //	IEnumerator Resets()
 //	{

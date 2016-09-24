@@ -146,6 +146,35 @@ public class pcControl : MonoBehaviour {
 		handsR.sprite = skinData[6];
 
 		particleStomp.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[7]);
+		transistionCanvas.instance.ChangeImage(skinData[7]);
+
+	}
+
+	public void UpdateSkin(string name)
+	{
+		//pull character art from sprite sheet. Assigned in order of appearance
+		string pathPrefix = "Skins/upLevel-character-";
+		string fullPath = pathPrefix+name;
+		PlayerPrefs.SetString("selectedSkin",name);
+		Sprite[] skinData = Resources.LoadAll<Sprite>(fullPath);
+
+		body.sprite = skinData[0];
+		hat.sprite = skinData[1];
+		armsL.sprite = skinData[2];
+		armsR.sprite = skinData[2];
+
+		particleRocket.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[3]);
+		particleBreak.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[3]);
+
+		legsL.sprite = skinData[4];
+		legsR.sprite = skinData[4];
+
+		face.sprite = skinData[5];
+		handsL.sprite = skinData[6];
+		handsR.sprite = skinData[6];
+
+		particleStomp.GetComponent<Renderer>().material.mainTexture = TextureFromSprite(skinData[7]);
+		transistionCanvas.instance.ChangeImage(skinData[7]);
 
 	}
 

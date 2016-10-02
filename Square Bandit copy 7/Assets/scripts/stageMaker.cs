@@ -31,16 +31,19 @@ public class stageMaker : MonoBehaviour {
 	public GameObject[] groundHazards;
 	public GameObject[] airHazards;
 	public GameObject[] npcHazards;
+	public GameObject coinBunch;
 
 
 	Vector3 groundHazardSpawnPoint = new Vector3(0, 10, 0);
 	Vector3 airHazardSpawnPoint = new Vector3(0, 40, 0);
+	Vector3 midSpawnPoint = new Vector3(0, 40, 0);
 	int randomizer = 0;
 	bool longSpawn = false;
 
 	Vector3 originalSpawnPoint;
 	Vector3 originalGroundSpawnPoint;
 	Vector3 originalAirSpawnPoint;
+	Vector3 originalMidSpawnPoint;
 
 
 
@@ -97,6 +100,11 @@ public class stageMaker : MonoBehaviour {
 					platformHolder = Instantiate(platform, spawnPoint, platform.transform.rotation) as GameObject;
 					floorCount++;
 					difficulty++;
+					if(Random.value >= 0.3f)
+					{
+						Vector3 random = new Vector3(Random.Range(-30, 30),0,0);
+						Instantiate(coinBunch,airHazardSpawnPoint+random,coinBunch.transform.rotation);
+					}
 				}
 				break;
 

@@ -53,7 +53,9 @@ public class levelManager : MonoBehaviour {
 	public CanvasGroup InGameGroup;
 	public CanvasGroup gameOverGroup;
 	public MenuManager menuScript;
-
+	public FCTCanvas fctCanvasScript;
+	public Text coinsText;
+	public Text coinsTextStore;
 
 	float fadeTime = 2;
 
@@ -109,16 +111,34 @@ public class levelManager : MonoBehaviour {
 		sprite.enabled = false;
 	}
 
-	public void FCT(Vector3 position)
-	{
-		
-	}
-
 	public void Scored(int scoreAmount)
 	{
 		score += scoreAmount;
 		scoreDisplay.text = score.ToString();
 		gameOverScoreDisplay.text = scoreDisplay.text;
+		fctCanvasScript.SetFCT(pc.transform.position, scoreAmount);
+	}
+
+	public void GainCoins(int amount)
+	{
+		int c = PlayerPrefs.GetInt("coins",0);
+		c += amount;
+		PlayerPrefs.SetInt("coins",c);
+		SetCoinsDisplay(c);
+	}
+
+	public void LoseCoins(int amount)
+	{
+		int c = PlayerPrefs.GetInt("coins",0);
+		c -= amount;
+		PlayerPrefs.SetInt("coins",c);
+		SetCoinsDisplay(c);
+	}
+
+	void SetCoinsDisplay(int amount)
+	{
+		coinsText.text = amount.ToString();
+		coinsTextStore.text = coinsText.text;
 	}
 
 
@@ -161,6 +181,11 @@ public class levelManager : MonoBehaviour {
 		lastPcPoint = pc.transform.position;
 		StartCoroutine( menuScript.FadeDelay() );
 
+		int hs = PlayerPrefs.GetInt("highscore",0);
+		if(hs < score)
+		{
+			PlayerPrefs.SetInt("highscore",score);
+		}
 
 	}
 //

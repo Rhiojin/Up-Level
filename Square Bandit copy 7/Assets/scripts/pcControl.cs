@@ -189,6 +189,11 @@ public class pcControl : MonoBehaviour {
 		return newTex;
 	}
 
+	public void PlayFootstep()
+	{
+		soundManager.instance.PlayStep();
+	}
+
 	public void Pause()
 	{
 		pauseVelocity = thisRigidbody.velocity;
@@ -516,6 +521,9 @@ public class pcControl : MonoBehaviour {
 	void Death()
 	{
 		dead = true;
+		stompParticle.transform.parent = null;
+		stompParticle.Emit(10);
+		stompParticle.Stop();	
 		levelScript.GameOver();
 	}
 
@@ -665,6 +673,12 @@ public class pcControl : MonoBehaviour {
 			cannon = col.gameObject.transform;
 			cannonCollider = col;
 			EnterDonkeyCannon();
+		}
+
+		if(col.CompareTag("coin"))
+		{
+			Destroy(col.gameObject);
+			levelScript.GainCoins(1);
 		}
 	}
 	void OnTriggerStay2D(Collider2D col)

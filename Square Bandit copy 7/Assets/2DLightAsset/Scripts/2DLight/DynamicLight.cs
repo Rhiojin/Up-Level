@@ -63,25 +63,30 @@ public class DynamicLight : MonoBehaviour {
 
 		renderer.sortingLayerName = "lighting";
 
-
+//		InvokeRepeating("SlowUpdate",0.01f, 0.06f);
 	}
 	
 
-	void LateUpdate(){
+//	void LateUpdate(){
+//
+//		getAllMeshes();
+//		setLight ();
+//		renderLightMesh ();
+//		resetBounds ();
+//
+//	}
 
-		//getAllMeshes();
-		//setLight ();
-		renderLightMesh ();
-		resetBounds ();
-
-	}
-
-
-	void FixedUpdate()
+	void SlowUpdate()
 	{
 		getAllMeshes();
 		setLight ();
 	}
+
+//	void FixedUpdate()
+//	{
+//		getAllMeshes();
+//		setLight ();
+//	}
 
 	void getAllMeshes(){
 		//allMeshes = FindObjectsOfType(typeof(PolygonCollider2D)) as PolygonCollider2D[];

@@ -36,6 +36,7 @@ public class camControl : MonoBehaviour {
 	Vector3 rockRotation;
 
 	Camera thisCam;
+	Transform soundManagerObj;
 
 	//	public levelManager levelScript;
 
@@ -46,6 +47,8 @@ public class camControl : MonoBehaviour {
 //		GameObject.Find("levelManager").GetComponent<levelManager>().playerDidDie += PlayerDied;
 		thisCam = GetComponent<Camera>();
 		rockRotation = zeroVector;
+
+		soundManagerObj = GameObject.Find("SoundManager").transform;
 	}
 
 
@@ -90,6 +93,7 @@ public class camControl : MonoBehaviour {
 			}
 		}
 
+		soundManagerObj.transform.position = transform.position;
 	}
 
 	void PlayerDied()

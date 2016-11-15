@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour {
 
@@ -26,6 +27,46 @@ public class MenuManager : MonoBehaviour {
 	public Text coinsTextStore;
 	public Text highScoreText;
 
+	public Dictionary<string, int> shopItems = new Dictionary<string, int>();
+	public Transform shopShelf;
+	bool shaking = false;
+	public Text fctText;
+	public CanvasGroup fctTextGroup;
+	public RectTransform fctTextTransform;
+
+	void Awake()
+	{
+		PlayerPrefs.SetInt("coins",10000);
+		
+		// build shop dict modularly. All that is required for adding a new skin is making the button in the content holder;
+		int childCount = shopShelf.transform.childCount;
+		int price = 75;
+		Transform child;
+		Transform priceText;
+		for(int i = 0; i < childCount; i++)
+		{
+			child = shopShelf.GetChild(i);
+			priceText = child.transform.Find("priceBlocker/priceHolder/price");
+			if(priceText != null)
+			{
+				shopItems.Add(child.name, price);
+				priceText.GetComponent<Text>().text = price.ToString();;
+				if(PlayerPrefs.GetInt(child.name+"Unlocked",0) == 1)
+				{
+					child.transform.Find("priceBlocker").gameObject.SetActive(false);
+				}
+			}
+			else
+			{
+				Debug.LogWarning(child.name+" does not have a priceblocker");
+			}
+			if(1>0 && i%5 == 0) price+=25;
+
+
+		}
+
+	}
+
 	void Start () 
 	{
 		transistionCanvas.instance.StartTransitionOut();
@@ -33,6 +74,8 @@ public class MenuManager : MonoBehaviour {
 		currentPanel = mainMenuPanel.GetComponent<RectTransform>();
 		SetCoinsDisplay(PlayerPrefs.GetInt("coins",0));
 		SetHighScoreDisplay(PlayerPrefs.GetInt("highscore",0));
+
+		AdManager._Adcolony_didFinishVideo += GetAdReward;
 	}
 	
 	public void GainCoins(int amount)
@@ -64,7 +107,56 @@ public class MenuManager : MonoBehaviour {
 
 	public void SetSkin(string name)
 	{
-		pcScript.UpdateSkin(name);
+		int c = PlayerPrefs.GetInt("coins",0);
+		if(shopItems.ContainsKey(name))
+		{
+			if(c >= shopItems[name])
+			{
+				c -= shopItems[name];
+				PlayerPrefs.SetInt("coins",c);
+				PlayerPrefs.SetInt(name+"Unlocked",1);
+
+				SetCoinsDisplay(c);
+				pcScript.UpdateSkin(name);
+				shopShelf.transform.Find(name+"/priceBlocker").gameObject.SetActive(false);
+				SetMenuFCT(shopShelf.transform.Find(name+"/priceBlocker").position,shopItems[name]);
+			}
+			else
+			{
+				//shake
+				if(!shaking)StartCoroutine( Shake(coinsTextStore.transform) );
+			}
+		}
+		else
+		{
+			print("priceblocker not targeting correct skin");
+		}
+
+	}
+
+	IEnumerator Shake(Transform obj)
+	{
+		shaking = true;
+		float x = 8.5f;
+		float y = x;
+		float settleSpeed = 0.4f;
+		Vector3 originalPos = obj.transform.position;
+		Vector3 targetPos = originalPos;
+
+		do
+		{
+			targetPos.x = originalPos.x+Random.Range(-x,x);
+			targetPos.y = originalPos.y+Random.Range(-y,y);
+			obj.position = targetPos;
+			x -= settleSpeed;
+			y -= settleSpeed;
+			yield return null;
+		}
+		while(x > 0);
+		obj.position = originalPos;
+		shaking = false;
+
+
 	}
 
 	void FadeOut()
@@ -82,7 +174,7 @@ public class MenuManager : MonoBehaviour {
 
 	public IEnumerator FadeDelay()
 	{
-		yield return new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(0.15f);
 		InvokeRepeating("InGameUIFadeOut",0.01f, 0.02f);
 		InvokeRepeating("GameOverUIFadeIn",0.01f, 0.02f);
 
@@ -97,10 +189,17 @@ public class MenuManager : MonoBehaviour {
 			if(gameOverGroup.alpha >= 1) 
 			{
 
-				gameOverGroup.blocksRaycasts = true;
+				//gameOverGroup.blocksRaycasts = true;
 				CancelInvoke("GameOverUIFadeIn");
+				StartCoroutine( Restart() );
 			}
 		}
+	}
+
+	IEnumerator Restart()
+	{
+		yield return new WaitForSeconds(1.25f);
+		StartOver();
 	}
 
 	void InGameUIFadeOut()
@@ -248,5 +347,30 @@ public class MenuManager : MonoBehaviour {
 	public void PlayVideoAd()
 	{
 		AdManager.AdColony_PlayVideoAd();
+	}
+
+	public void GetAdReward(int amount)
+	{
+		GainCoins(amount);
+	}
+
+	public void SetMenuFCT(Vector3 pos,int p)
+	{
+		fctTextTransform.transform.position = pos;
+		StartCoroutine( StartMenuFCT(p) );
+	}
+
+
+	IEnumerator StartMenuFCT (int points) 
+	{
+		fctText.text = "-"+points.ToString();
+		fctTextGroup.alpha = 1;
+//		fctTextTransform.anchoredPosition = Vector3.zero;
+		while(fctTextGroup.alpha > 0)
+		{
+			fctTextGroup.alpha -= 0.5f*Time.deltaTime;
+			fctTextTransform.anchoredPosition += 100*Vector2.up*Time.deltaTime;
+			yield return null;
+		}
 	}
 }

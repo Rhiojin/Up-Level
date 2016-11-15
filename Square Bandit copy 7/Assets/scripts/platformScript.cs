@@ -4,7 +4,7 @@ using System.Collections;
 public class platformScript : MonoBehaviour {
 
 
-	public Transform light;
+//	public Transform light;
 	public SpriteRenderer bg;
 
 	public bool longPlatform = false;
@@ -17,7 +17,7 @@ public class platformScript : MonoBehaviour {
 		levelScript = GameObject.Find("level manager").GetComponent<levelManager>();
 
 
-		light.localPosition = new Vector3(Random.Range(-0.9f,0.9f),light.localPosition.y, light.localPosition.z);
+//		light.localPosition = new Vector3(Random.Range(-0.9f,0.9f),light.localPosition.y, light.localPosition.z);
 
 		bg.color = levelScript.BGcolors[Random.Range(0,levelScript.BGcolors.Length)];
 

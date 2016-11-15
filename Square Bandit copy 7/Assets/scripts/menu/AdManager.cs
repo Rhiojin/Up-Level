@@ -44,19 +44,19 @@ public class AdManager : MonoBehaviour {
 	public static string GP_appID = "";
 	public static string GP_vidZoneID = "";
 
-	public static AdManager adManagerInstance;
+	public static AdManager Instance;
 
 	public static bool AmazonPlatform = false;
 
 	void Awake()
 	{
-		if(adManagerInstance != null)
+		if(Instance != null)
 		{
 			Destroy(gameObject);
 			return;
 
 		}
-		adManagerInstance = this;
+		Instance = this;
 		DontDestroyOnLoad(gameObject);
 
 
@@ -229,7 +229,7 @@ public class AdManager : MonoBehaviour {
 			gotReward = true;
 			if(_Adcolony_didFinishVideo != null)
 			{
-				_Adcolony_didFinishVideo(150);
+				_Adcolony_didFinishVideo(100);
 			}
 		}
 	}

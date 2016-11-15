@@ -19,9 +19,9 @@ public class stageMaker : MonoBehaviour {
 	int floorMax = 4; //4
 
 	int lightCount = 0;
-	int lightCountMax = 2;
+	int lightCountMax = 1;
 	Vector3 lightSpawnpoint = new Vector3(-150,70,0);
-	float lightSpawnDelta = 300;
+	float lightSpawnDelta = 450;
 
 	GameObject platformHolder;
 	GameObject hazardHolder;
@@ -56,8 +56,8 @@ public class stageMaker : MonoBehaviour {
 		originalGroundSpawnPoint = groundHazardSpawnPoint;
 		originalAirSpawnPoint = airHazardSpawnPoint;
 
-		InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
-		InvokeRepeating("SpawnLight", 0.1f, 0.1f);
+//		InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
+		SpawnLight();
 	}
 	
 
@@ -227,12 +227,23 @@ public class stageMaker : MonoBehaviour {
 	{
 		if(lightCount < lightCountMax)
 		{
+			print("spawning light");
 			Instantiate(Light2D,lightSpawnpoint, Light2D.transform.rotation);
 			lightSpawnpoint.x *= -1;
 			lightSpawnpoint.y += lightSpawnDelta;
 			lightCount++;
 
 		}
+	}
+
+	public void MoveLight(Transform light)
+	{
+		print("moving light");
+		light.transform.position = lightSpawnpoint;
+		lightSpawnpoint.x *= -1;
+		lightSpawnpoint.y += lightSpawnDelta;
+
+
 	}
 
 	void OnTriggerEnter2D(Collider2D trig)
@@ -245,15 +256,15 @@ public class stageMaker : MonoBehaviour {
 
 		if(trig.CompareTag("lightTrashTrigger"))
 		{
-			Destroy(trig.transform.parent.gameObject);
-			lightCount--;
+			MoveLight(trig.transform.parent);
+//			lightCount--;
 		}
 //		if(trig.CompareTag("longTrashTrigger"))
 //		{
 //			Destroy(trig.transform.parent.gameObject);
 //			floorCount-=2;
 //		}
-		else if(!trig.CompareTag("eraser"))
+		else if(!trig.CompareTag("eraser") && !trig.CompareTag("weightless"))
 		{
 			Destroy(trig.transform.gameObject);
 		}

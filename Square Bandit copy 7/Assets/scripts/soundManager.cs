@@ -115,12 +115,12 @@ public class soundManager : MonoBehaviour {
 
 	public void PlayClip(string clip, float vol)
 	{
-		SFXsource.pitch = Random.Range(0.85f,1.15f);
+		SFXsource.pitch = Random.Range(0.9f,1f);
 		SFXsource.PlayOneShot(soundLibrary[clip], vol);
 	}
 	public void PlayStep()
 	{
-		FootStepSource.pitch = Random.Range(0.35f,0.65f);
+		FootStepSource.pitch = Random.Range(0.95f,1);
 		FootStepSource.PlayOneShot(soundLibrary["footstep"], 0.2f);
 	}
 

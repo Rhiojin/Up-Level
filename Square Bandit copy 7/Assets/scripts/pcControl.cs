@@ -6,10 +6,12 @@ public class pcControl : MonoBehaviour {
 
 	float moveSpeed = -20;
 	float jumpForce = 3550;
+	float weightLessForce = 42050;
 	float boostForce = 5550;
 	float stompForce = 4850;
 	float maxGravity = 15;
 	float actionThreshold = 40;
+	float thisGravityScale = 15;
 
 	Vector3 leftBounds;
 	Vector3 rightBounds;
@@ -27,12 +29,17 @@ public class pcControl : MonoBehaviour {
 	Vector2 screenSpacePos = Vector2.zero;
 	bool RocketBoosting = false;
 	bool ButtStomping = false;
+	bool ShoulderBashing = false;
 	bool toggling = false;
 	bool donkeyCannoning = false;
+	bool weightless = false;
+	bool isFacingRight = false;
 	BoxCollider2D oneWayPlatform;
 
 	Vector2 zeroVector = Vector2.zero;
 	Vector2 upVector = Vector2.up;
+	Vector2 forwardVector2 = Vector2.right;
+	Vector2 bashForce = new Vector2(1550, 1200);
 
 	Vector2 pauseVelocity = Vector2.zero;
 	bool paused = false;
@@ -54,6 +61,7 @@ public class pcControl : MonoBehaviour {
 	public ParticleSystem rocketParticle;
 	public ParticleSystem stompParticle;
 	public ParticleSystem breakParticle;
+	public ParticleSystem poofParticle;
 	bool togglingTrail = false;
 
 	Transform cannon;
@@ -64,6 +72,8 @@ public class pcControl : MonoBehaviour {
 	Vector2 touchStart = Vector2.zero;
 	Vector2 touchCurrent = Vector2.zero;
 	Vector2 swipeDistance = Vector2.zero;
+	float yStart;
+	float yCurrent;
 
 	public SpriteRenderer hat;
 	public SpriteRenderer body;
@@ -77,6 +87,7 @@ public class pcControl : MonoBehaviour {
 	public ParticleSystem particleRocket;
 	public ParticleSystem particleStomp;
 	public ParticleSystem particleBreak;
+	public BoxCollider2D fistCollider;
 
 
 
@@ -100,7 +111,7 @@ public class pcControl : MonoBehaviour {
 		trail.enabled = false;
 
 		LoadCharacterSkin();
-
+		thisGravityScale = thisRigidbody.gravityScale;
 	}
 	
 	// Update is called once per frame
@@ -236,82 +247,126 @@ public class pcControl : MonoBehaviour {
 //					StartCoroutine( ButtStomp() );
 //			}
 		}
+
+		if(Input.GetKeyDown(KeyCode.A))
+		{
+			if(!ShoulderBashing) StartCoroutine(ShoulderBash());
+		}
+
 		#endif
 
-		#if UNITY_ANDROID || UNITY_IOS
-//		if(Input.touchCount > 0)
-//		{
-//			touch = Input.GetTouch(0);
-//
-////			if(touch.tapCount == 1)
-////			{
-////				if(!donkeyCannoning)SwapTravelDirection();
-////				else  StartCoroutine( DonkeyCannonShot() );
-////			}
-//
-//
-//			if(touch.phase == TouchPhase.Began)
+		#if UNITY_ANDROID || UNITY_IOS || UNITY_METRO
+		if(Input.touchCount > 0)
+		{
+			touch = Input.GetTouch(0);
+
+//			if(touch.tapCount == 1)
 //			{
-//				touchMoved = false;
-//				touchStart = touch.position;
-//
+//				if(!donkeyCannoning)SwapTravelDirection();
+//				else  StartCoroutine( DonkeyCannonShot() );
 //			}
-//
-//			if(touch.phase == TouchPhase.Moved)
-//			{
-//				if(!donkeyCannoning)
-//				{
+
+
+			if(touch.phase == TouchPhase.Began)
+			{
+				touchMoved = false;
+				touchStart = touch.position;
+
+			}
+
+			if(touch.phase == TouchPhase.Moved)
+			{
+				if(!donkeyCannoning)
+				{
 //					touchMoved = true;
-//					touchCurrent = touch.position;
-//
-////					if(Vector2.Distance(touchCurrent, touchStart) > 10)
-////					{
-//						
-//
-////					}
-//				}
-//			}
-//
-//			if(touch.phase == TouchPhase.Ended)
-//			{
-//				if(touchMoved == false)
-//				{
-//
-//
-//					if(!donkeyCannoning)SwapTravelDirection();
-//					else  StartCoroutine( DonkeyCannonShot() );
-//
-//
-//				}
-//
-//				else
-//				{
-//					if(Mathf.Abs(touchCurrent.y) > Mathf.Abs(touchStart.y))
+					touchCurrent = touch.position;
+					if(Vector2.Distance(touchStart, touchCurrent) > 10) touchMoved = true;
+
+//					if(Vector2.Distance(touchCurrent, touchStart) > 10)
 //					{
-//						if(canJump)
-//						{
-//							Jump();
-//						}
-//						else 
-//						{
-//							if(!RocketBoosting && Mathf.Abs(touchCurrent.y) > Mathf.Abs(touchStart.y))
-//							{
-//								StartCoroutine( RocketBoost() );
-//							}
-//							else
-//							{
-//								if(!ButtStomping)
-//									StartCoroutine( ButtStomp() );
-//
-//							}
-//						}
-//
+						
+
 //					}
-//
+				}
+			}
+
+			if(touch.phase == TouchPhase.Ended)
+			{
+				if(touchMoved == false)
+				{
+
+					if(!donkeyCannoning)
+					{
+						//check water or space biome
+						if(weightless)
+						{
+							
+						}
+						else if(canJump)
+						{
+							if(weightless)
+							{
+								WeightlessJump();
+							}
+							else Jump();
+						}
+						else
+						{
+							if(!RocketBoosting)
+							{
+								StartCoroutine( RocketBoost() );
+							}
+						}						
+					}
+					else 
+					{
+						StartCoroutine( DonkeyCannonShot() );
+					}
+
+				}
+
+				else
+				{
+//					if(Vector2.Distance(touchStart, touchCurrent) > 3)
+//					{
+					Vector2 v = touchCurrent - touchStart;
+					if(Mathf.Abs(v.x) > Mathf.Abs(v.y))
+//						if(Mathf.Abs(touchCurrent.x) > Mathf.Abs(touchStart.y))
+						{
+							if(touchCurrent.x > touchStart.x) 
+							{
+								if(isFacingRight)
+								{
+									if(!ShoulderBashing)StartCoroutine( ShoulderBash() );
+								}
+								else
+								{
+									SwapTravelDirection();
+								}
+							}
+							else
+							{
+								if(!isFacingRight)
+								{
+									if(!ShoulderBashing) StartCoroutine( ShoulderBash() );
+								}
+								else
+								{
+									SwapTravelDirection();
+								}
+							}
+						}
+						else
+						{
+							if(!ButtStomping) StartCoroutine( ButtStomp() );
+						}
+					}
+
 //				}
-//			}
-//		}
+			}
+		}
 //
+
 
 		#endif
 	}
@@ -367,6 +422,7 @@ public class pcControl : MonoBehaviour {
 
 	public void SwapTravelDirection()
 	{
+		isFacingRight = !isFacingRight;
 		moveSpeed *= -1;
 		scale.x *= -1;
 		transform.localScale = scale;
@@ -382,7 +438,11 @@ public class pcControl : MonoBehaviour {
 
 		else 
 		{
-			if(canJump)
+			if(weightless)
+			{
+				WeightlessJump();
+			}
+			else if(canJump)
 			{
 				Jump();
 			}
@@ -408,7 +468,14 @@ public class pcControl : MonoBehaviour {
 	{
 		canJump = false;
 		anim.Play("pc_Jump");
+//		anim.Play("pc_jump2");
+
 		thisRigidbody.AddForce(upVector*jumpForce);
+	}
+
+	void WeightlessJump()
+	{
+		thisRigidbody.AddForce(upVector*weightLessForce);
 	}
 
 	IEnumerator RocketBoost()
@@ -447,6 +514,29 @@ public class pcControl : MonoBehaviour {
 
 		//thisCollider.isTrigger = false;
 		//ButtStomping = false;
+	}
+
+	IEnumerator ShoulderBash()
+	{
+		ShoulderBashing = true;
+		fistCollider.enabled = true;
+		trail.enabled = true;
+		anim.Play("pc_ShoulderBash");
+
+		stompParticle.Emit(2);
+		stompParticle.Stop();
+		poofParticle.Emit(3);
+		poofParticle.Stop();
+
+		thisRigidbody.velocity = zeroVector;
+		if(isFacingRight)
+			thisRigidbody.AddForce(new Vector2(bashForce.x,bashForce.y));
+		else thisRigidbody.AddForce(new Vector2(-bashForce.x,bashForce.y));
+
+		yield return new WaitForSeconds(1);
+		fistCollider.enabled = false;
+		trail.enabled = false;
+		ShoulderBashing = false;
 	}
 
 	void EnterDonkeyCannon()
@@ -534,7 +624,7 @@ public class pcControl : MonoBehaviour {
 		{
 			if(ButtStomping) camScript.StartCamRock(transform.position.x);
 //			else if(RocketBoosting) camScript.StartScreenShake();
-			anim.Play("pc_Run");
+			if(!canJump && !weightless)anim.Play("pc_Run");
 			canJump = true;
 			RocketBoosting = false;
 			//rocketParticle.Stop();
@@ -553,7 +643,7 @@ public class pcControl : MonoBehaviour {
 //			anim.Play("pc_Run");
 //			canJump = true;
 //			RocketBoosting = false;
-			if(ButtStomping || RocketBoosting)
+			if(ButtStomping || RocketBoosting || ShoulderBashing)
 			{
 				if(ButtStomping)
 				{
@@ -568,12 +658,21 @@ public class pcControl : MonoBehaviour {
 					breakParticle.Emit(5);
 					breakParticle.Stop();
 				}
+				else if(ShoulderBashing)
+				{
+					camScript.StartCamRock(transform.position.x);
+					stompParticle.Emit(5);
+					stompParticle.Stop();
+				}
 				ButtStomping = false;
 				//RocketBoosting = false;
 				//rocketParticle.Stop();
 				Destroy(colEnt.collider.gameObject);
-				thisRigidbody.velocity = zeroVector;
-				thisRigidbody.AddForce(upVector*jumpForce);
+				if(!ShoulderBashing)
+				{
+					thisRigidbody.velocity = zeroVector;
+					thisRigidbody.AddForce(upVector*jumpForce);
+				}
 				levelScript.Scored(10);
 			}
 			else 
@@ -677,9 +776,40 @@ public class pcControl : MonoBehaviour {
 
 		if(col.CompareTag("coin"))
 		{
+			soundManager.instance.PlayClip("coinSound", 0.5f);
 			Destroy(col.gameObject);
 			levelScript.GainCoins(1);
+
 		}
+
+		if(col.CompareTag("weightless"))
+		{
+			print("aerae1");
+			thisRigidbody.velocity = Vector3.zero;
+			thisRigidbody.AddForce(upVector*weightLessForce);
+			thisRigidbody.AddForce(upVector*weightLessForce);
+			if(weightless == false)
+			{
+				weightless = true;
+				thisRigidbody.gravityScale = thisRigidbody.gravityScale*0.2f;
+				thisRigidbody.mass = 55;
+				anim.Play("pc_Swim");
+				anim.speed = 0.4f;
+			}
+		}
+
+//		if(col.CompareTag("weightlessEnd"))
+//		{
+//			if(weightless == true)
+//			{
+//				weightless = false;
+//				thisRigidbody.velocity = Vector3.zero;
+//				thisRigidbody.gravityScale = thisGravityScale;
+//				thisRigidbody.mass = 1;
+//				anim.speed = 1;
+//				thisRigidbody.velocity *= 0.5f;
+//			}
+//		}
 	}
 	void OnTriggerStay2D(Collider2D col)
 	{
@@ -687,6 +817,19 @@ public class pcControl : MonoBehaviour {
 		{
 			oneWayPlatform = col.transform.parent.GetComponent<BoxCollider2D>();
 			if(oneWayPlatform.enabled == true) oneWayPlatform.enabled = false;
+		}
+
+		if(col.CompareTag("weightless"))
+		{
+			if(weightless == false)
+			{
+				print("aerae0");
+				weightless = true;
+				thisRigidbody.gravityScale = thisRigidbody.gravityScale*0.2f;
+				thisRigidbody.mass = 55;
+				anim.Play("pc_Swim");
+				anim.speed = 0.3f;
+			}
 		}
 	}
 
@@ -698,6 +841,20 @@ public class pcControl : MonoBehaviour {
 			{
 				oneWayPlatform.enabled = true;
 				oneWayPlatform = null;
+			}
+		}
+
+		if(col.CompareTag("weightless"))
+		{
+			
+			if(weightless == true)
+			{
+				weightless = false;
+				//thisRigidbody.velocity = Vector3.zero;
+				thisRigidbody.gravityScale = thisGravityScale;
+				thisRigidbody.mass = 1;
+				anim.speed = 1;
+				thisRigidbody.velocity *= 0.5f;
 			}
 		}
 	}

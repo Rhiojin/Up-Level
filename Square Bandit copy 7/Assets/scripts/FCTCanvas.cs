@@ -8,9 +8,7 @@ public class FCTCanvas : MonoBehaviour {
 	public RectTransform fctTextTransform;
 	public CanvasGroup fctTextGroup;
 	Vector2 zeroVector = new Vector2(0,1);
- 	void Start () {
-	
-	}
+
 	
 	public void SetFCT(Vector3 pos,int p)
 	{

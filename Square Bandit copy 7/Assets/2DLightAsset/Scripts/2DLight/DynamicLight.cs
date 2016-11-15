@@ -67,14 +67,14 @@ public class DynamicLight : MonoBehaviour {
 	}
 	
 
-//	void LateUpdate(){
-//
-//		getAllMeshes();
-//		setLight ();
-//		renderLightMesh ();
-//		resetBounds ();
-//
-//	}
+	void LateUpdate(){
+
+		getAllMeshes();
+		setLight ();
+		renderLightMesh ();
+		resetBounds ();
+
+	}
 
 	void SlowUpdate()
 	{

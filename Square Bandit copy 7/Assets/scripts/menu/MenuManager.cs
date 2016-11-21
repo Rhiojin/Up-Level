@@ -16,7 +16,7 @@ public class MenuManager : MonoBehaviour {
 	public GameObject mainMenuPanel;
 	public GameObject gameOverPanel;
 	Vector2 onScreenPos = Vector2.zero;
-	Vector2 offScreenPos = Vector2.zero;
+	Vector2 offScreenPos = new Vector2(0,-1500);
 
 	float fadeTime = 2;
 	public pcControl pcScript;
@@ -33,6 +33,7 @@ public class MenuManager : MonoBehaviour {
 	public Text fctText;
 	public CanvasGroup fctTextGroup;
 	public RectTransform fctTextTransform;
+	public RectTransform sharePanel;
 
 	void Awake()
 	{
@@ -167,6 +168,19 @@ public class MenuManager : MonoBehaviour {
 			if(mainMenuGroup.alpha <= 0) 
 			{
 				mainMenuPanel.SetActive(false);
+				CancelInvoke("FadeOut");
+			}
+		}
+	}
+
+	void FadeIn()
+	{
+		mainMenuPanel.SetActive(true);
+		if(mainMenuGroup.alpha < 1)
+		{
+			mainMenuGroup.alpha +=Time.deltaTime*fadeTime;
+			if(mainMenuGroup.alpha >= 0) 
+			{
 				CancelInvoke("FadeOut");
 			}
 		}
@@ -341,6 +355,52 @@ public class MenuManager : MonoBehaviour {
 	public void Load()
 	{
 		SceneManager.LoadScene("levelScene");
+	}
+
+	public void ShowShareOverlay()
+	{
+		StopCoroutine( "MoveShareOverlayOut" );
+		InvokeRepeating("FadeOut",0.01f, 0.02f);
+		StartCoroutine( "MoveShareOverlayIn" );
+	}
+
+	public void HideShareOverlay()
+	{
+		StopCoroutine( "MoveShareOverlayIn" );
+		sharePanel.anchoredPosition = Vector2.zero;
+		InvokeRepeating("FadeIn",0.01f, 0.02f);
+		StartCoroutine( "MoveShareOverlayOut" );
+	}
+
+	IEnumerator MoveShareOverlayIn()
+	{
+		
+		while(sharePanel.anchoredPosition != onScreenPos)
+		{
+			sharePanel.anchoredPosition = Vector2.Lerp(sharePanel.anchoredPosition, onScreenPos, 10*Time.deltaTime);
+			yield return null;
+		}
+		sharePanel.anchoredPosition = Vector2.zero;
+	}
+
+	IEnumerator MoveShareOverlayOut()
+	{
+		
+		while(sharePanel.anchoredPosition != offScreenPos)
+		{
+			sharePanel.anchoredPosition = Vector2.Lerp(sharePanel.anchoredPosition, offScreenPos, 10*Time.deltaTime);
+			yield return null;
+		}
+		sharePanel.anchoredPosition = offScreenPos;
+	}
+
+	public void ShareFB()
+	{
+	}
+
+	public void ShareTW()
+	{
+		
 	}
 
 	//extrabits

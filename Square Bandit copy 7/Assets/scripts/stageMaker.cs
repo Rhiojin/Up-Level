@@ -7,6 +7,7 @@ public class stageMaker : MonoBehaviour {
 	public GameObject platformLong;
 	public GameObject platformLongBreakables;
 	public GameObject platformLongDonkeyCannon;
+	public GameObject platformLongWater;
 	public GameObject platformBossRoom;
 	public GameObject Light2D;
 
@@ -56,7 +57,7 @@ public class stageMaker : MonoBehaviour {
 		originalGroundSpawnPoint = groundHazardSpawnPoint;
 		originalAirSpawnPoint = airHazardSpawnPoint;
 
-//		InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
+		InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
 		SpawnLight();
 	}
 	
@@ -89,7 +90,8 @@ public class stageMaker : MonoBehaviour {
 			int p = 0;
 			if(difficulty%5 == 0)
 			{
-				p = Random.Range(1,4); // rework to take difficuly into consideration
+				// select a platform other than the first every 5 levels
+				p = Random.Range(1,5);
 			}
 			else p = 0;
 
@@ -151,6 +153,20 @@ public class stageMaker : MonoBehaviour {
 				}
 				break;
 
+			case(4):
+				{
+					spawnPoint.y += longPlatformDelta;
+					platformHolder = Instantiate(platformLongWater, spawnPoint, platform.transform.rotation) as GameObject;
+					floorCount++;
+
+					difficulty++;
+					spawnPoint.y += delta;
+					groundHazardSpawnPoint.y += longPlatformDelta+delta;
+					airHazardSpawnPoint.y += longPlatformDelta+delta;
+					longSpawn = true;
+				}
+				break;
+
 				default:
 				{
 					platformHolder = Instantiate(platform, spawnPoint, platform.transform.rotation) as GameObject;
@@ -160,9 +176,6 @@ public class stageMaker : MonoBehaviour {
 				break;
 			}
 
-//			platformHolder = Instantiate(platform, spawnPoint, platform.transform.rotation) as GameObject;
-//			floorCount++;
-//			difficulty++;
 
 			//add hazards and such
 

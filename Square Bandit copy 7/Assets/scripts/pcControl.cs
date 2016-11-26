@@ -88,6 +88,8 @@ public class pcControl : MonoBehaviour {
 	public ParticleSystem particleStomp;
 	public ParticleSystem particleBreak;
 	public BoxCollider2D fistCollider;
+	public Transform particlePosTop;
+	public Transform particePosFront;
 
 
 
@@ -358,7 +360,7 @@ public class pcControl : MonoBehaviour {
 						}
 						else
 						{
-							if(!ButtStomping) StartCoroutine( ButtStomp() );
+							if(!ButtStomping && !canJump) StartCoroutine( ButtStomp() );
 						}
 					}
 
@@ -523,8 +525,6 @@ public class pcControl : MonoBehaviour {
 		trail.enabled = true;
 		anim.Play("pc_ShoulderBash");
 
-		stompParticle.Emit(2);
-		stompParticle.Stop();
 		poofParticle.Emit(3);
 		poofParticle.Stop();
 
@@ -545,12 +545,8 @@ public class pcControl : MonoBehaviour {
 		thisRigidbody.gravityScale = 0;
 		thisRigidbody.velocity = zeroVector;
 
-		breakParticle.Emit(10);
-		breakParticle.Stop();
-//		thisBody.SetActive(false);
 		transform.position = cannon.position;
-//		anim.Play("pc_DonkeyCannon");
-//		transform.parent = cannon;
+
 
 	}
 	IEnumerator DonkeyCannonShot()
@@ -570,7 +566,6 @@ public class pcControl : MonoBehaviour {
 
 		rocketParticle.Stop();
 		RocketBoosting = false;
-//		anim.Play("pc_Jump");
 	}
 
 	IEnumerator TogglePlatform(BoxCollider2D _col)
@@ -624,10 +619,13 @@ public class pcControl : MonoBehaviour {
 		{
 			if(ButtStomping) camScript.StartCamRock(transform.position.x);
 //			else if(RocketBoosting) camScript.StartScreenShake();
-			if(!canJump && !weightless)anim.Play("pc_Run");
+			if(!canJump && !weightless || ShoulderBashing)
+			{
+				print("running");
+				anim.Play("pc_Run");
+			}
 			canJump = true;
 			RocketBoosting = false;
-			//rocketParticle.Stop();
 			if(ButtStomping) 
 			{
 				stompParticle.Emit(5);
@@ -639,10 +637,6 @@ public class pcControl : MonoBehaviour {
 
 		if(colEnt.collider.CompareTag("enemy"))
 		{
-			//	print("eter");
-//			anim.Play("pc_Run");
-//			canJump = true;
-//			RocketBoosting = false;
 			if(ButtStomping || RocketBoosting || ShoulderBashing)
 			{
 				if(ButtStomping)
@@ -655,14 +649,18 @@ public class pcControl : MonoBehaviour {
 				else if(RocketBoosting)
 				{
 					camScript.StartScreenShake();
-					breakParticle.Emit(5);
+
+					breakParticle.transform.position = colEnt.transform.position;
+					breakParticle.Emit(10);
 					breakParticle.Stop();
+
 				}
 				else if(ShoulderBashing)
 				{
 					camScript.StartCamRock(transform.position.x);
-					stompParticle.Emit(5);
-					stompParticle.Stop();
+					breakParticle.transform.position = colEnt.transform.position;
+					breakParticle.Emit(10);
+					breakParticle.Stop();
 				}
 				ButtStomping = false;
 				//RocketBoosting = false;
@@ -677,16 +675,20 @@ public class pcControl : MonoBehaviour {
 			}
 			else 
 			{
-				breakParticle.Emit(15);
+				breakParticle.transform.position = colEnt.transform.position;
+				breakParticle.Emit(10);
 				breakParticle.Stop();
+
 				Death();
 			}
 		}
 
 		if(colEnt.collider.CompareTag("hazard"))
 		{
-			breakParticle.Emit(15);
+			breakParticle.transform.position = colEnt.transform.position;
+			breakParticle.Emit(10);
 			breakParticle.Stop();
+
 			Death();
 		}
 
@@ -714,9 +716,11 @@ public class pcControl : MonoBehaviour {
 				thisRigidbody.velocity = zeroVector;
 				anim.Play("pc_Jump");
 				trail.enabled = false;
-//				thisRigidbody.AddForce(-upVector*jumpForce);
+
+				breakParticle.transform.position = colEnt.transform.position;
 				breakParticle.Emit(5);
 				breakParticle.Stop();
+
 			}
 
 			if(!canJump)
@@ -771,6 +775,11 @@ public class pcControl : MonoBehaviour {
 		{
 			cannon = col.gameObject.transform;
 			cannonCollider = col;
+
+			breakParticle.transform.position = col.transform.position;
+			breakParticle.Emit(10);
+			breakParticle.Stop();
+
 			EnterDonkeyCannon();
 		}
 
@@ -784,7 +793,6 @@ public class pcControl : MonoBehaviour {
 
 		if(col.CompareTag("weightless"))
 		{
-			print("aerae1");
 			thisRigidbody.velocity = Vector3.zero;
 			thisRigidbody.AddForce(upVector*weightLessForce);
 			thisRigidbody.AddForce(upVector*weightLessForce);

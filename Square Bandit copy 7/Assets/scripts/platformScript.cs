@@ -8,6 +8,7 @@ public class platformScript : MonoBehaviour {
 	public SpriteRenderer bg;
 
 	public bool longPlatform = false;
+	public bool waterFloor = false;
 
 	levelManager levelScript;
 
@@ -19,7 +20,10 @@ public class platformScript : MonoBehaviour {
 
 //		light.localPosition = new Vector3(Random.Range(-0.9f,0.9f),light.localPosition.y, light.localPosition.z);
 
-		bg.color = levelScript.BGcolors[Random.Range(0,levelScript.BGcolors.Length)];
+		if(waterFloor)
+			bg.color = levelScript.waterColors[Random.Range(0,levelScript.waterColors.Length)];
+		else
+			bg.color = levelScript.BGcolors[Random.Range(0,levelScript.BGcolors.Length)];
 
 		if(!longPlatform)
 		{

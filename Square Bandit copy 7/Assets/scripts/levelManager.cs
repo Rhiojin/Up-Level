@@ -17,6 +17,7 @@ public class levelManager : MonoBehaviour {
 	public bool paused = false;
 
 	public Color[] BGcolors;
+	public Color[] waterColors;
 	public Sprite[] bgWalls;
 
 	public int difficulty = 0;

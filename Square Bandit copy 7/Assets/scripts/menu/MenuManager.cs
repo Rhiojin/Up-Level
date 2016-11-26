@@ -35,6 +35,16 @@ public class MenuManager : MonoBehaviour {
 	public RectTransform fctTextTransform;
 	public RectTransform sharePanel;
 
+	public Image hat;
+	public Image body;
+	public Image face;
+	public Image armsL;
+	public Image armsR;
+	public Image handsL;
+	public Image handsR;
+	public Image legsL;
+	public Image legsR;
+
 	void Awake()
 	{
 		PlayerPrefs.SetInt("coins",10000);
@@ -64,6 +74,7 @@ public class MenuManager : MonoBehaviour {
 			if(1>0 && i%5 == 0) price+=25;
 
 
+
 		}
 
 	}
@@ -77,6 +88,8 @@ public class MenuManager : MonoBehaviour {
 		SetHighScoreDisplay(PlayerPrefs.GetInt("highscore",0));
 
 		AdManager._Adcolony_didFinishVideo += GetAdReward;
+
+//		StartCoroutine( LoadSocialSkin() );
 	}
 	
 	public void GainCoins(int amount)
@@ -111,21 +124,30 @@ public class MenuManager : MonoBehaviour {
 		int c = PlayerPrefs.GetInt("coins",0);
 		if(shopItems.ContainsKey(name))
 		{
-			if(c >= shopItems[name])
+			if(PlayerPrefs.GetInt(name+"Unlocked",0) == 0)
 			{
-				c -= shopItems[name];
-				PlayerPrefs.SetInt("coins",c);
-				PlayerPrefs.SetInt(name+"Unlocked",1);
+				if(c >= shopItems[name])
+				{
+					c -= shopItems[name];
+					PlayerPrefs.SetInt("coins",c);
+					PlayerPrefs.SetInt(name+"Unlocked",1);
 
-				SetCoinsDisplay(c);
-				pcScript.UpdateSkin(name);
-				shopShelf.transform.Find(name+"/priceBlocker").gameObject.SetActive(false);
-				SetMenuFCT(shopShelf.transform.Find(name+"/priceBlocker").position,shopItems[name]);
+					SetCoinsDisplay(c);
+					pcScript.UpdateSkin(name);
+//					StartCoroutine( UpdateSocialSkin(name) );
+					shopShelf.transform.Find(name+"/priceBlocker").gameObject.SetActive(false);
+					SetMenuFCT(shopShelf.transform.Find(name+"/priceBlocker").position,shopItems[name]);
+				}
+				else
+				{
+					//shake
+					if(!shaking)StartCoroutine( Shake(coinsTextStore.transform) );
+				}
 			}
 			else
 			{
-				//shake
-				if(!shaking)StartCoroutine( Shake(coinsTextStore.transform) );
+				pcScript.UpdateSkin(name);
+//				StartCoroutine( UpdateSocialSkin(name) );
 			}
 		}
 		else
@@ -133,6 +155,47 @@ public class MenuManager : MonoBehaviour {
 			print("priceblocker not targeting correct skin");
 		}
 
+	}
+
+	IEnumerator LoadSocialSkin()
+	{
+		//pull character art from sprite sheet. Assigned in order of appearance
+		string pathPrefix = "Skins/upLevel-character-";
+		string skinName = PlayerPrefs.GetString("selectedSkin","boxer");
+		string fullPath = pathPrefix+skinName;
+		Sprite[] skinData = Resources.LoadAll<Sprite>(fullPath);
+		yield return new WaitForSeconds(0.25f);
+		body.sprite = skinData[0];
+		hat.sprite = skinData[1];
+		armsL.sprite = skinData[2];
+		armsR.sprite = skinData[2];
+		yield return new WaitForSeconds(0.25f);
+		legsL.sprite = skinData[4];
+		legsR.sprite = skinData[4];
+		yield return new WaitForSeconds(0.25f);
+		face.sprite = skinData[5];
+		handsL.sprite = skinData[6];
+		handsR.sprite = skinData[6];
+	}
+
+	IEnumerator UpdateSocialSkin(string name)
+	{
+		//pull character art from sprite sheet. Assigned in order of appearance
+		string pathPrefix = "Skins/upLevel-character-";
+		string fullPath = pathPrefix+name;
+		Sprite[] skinData = Resources.LoadAll<Sprite>(fullPath);
+		yield return new WaitForSeconds(0.25f);
+		body.sprite = skinData[0];
+		hat.sprite = skinData[1];
+		armsL.sprite = skinData[2];
+		armsR.sprite = skinData[2];
+		yield return new WaitForSeconds(0.25f);
+		legsL.sprite = skinData[4];
+		legsR.sprite = skinData[4];
+		yield return new WaitForSeconds(0.25f);
+		face.sprite = skinData[5];
+		handsL.sprite = skinData[6];
+		handsR.sprite = skinData[6];
 	}
 
 	IEnumerator Shake(Transform obj)
@@ -179,9 +242,9 @@ public class MenuManager : MonoBehaviour {
 		if(mainMenuGroup.alpha < 1)
 		{
 			mainMenuGroup.alpha +=Time.deltaTime*fadeTime;
-			if(mainMenuGroup.alpha >= 0) 
+			if(mainMenuGroup.alpha >= 1) 
 			{
-				CancelInvoke("FadeOut");
+				CancelInvoke("FadeIn");
 			}
 		}
 	}

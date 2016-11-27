@@ -89,7 +89,7 @@ public class MenuManager : MonoBehaviour {
 
 		AdManager._Adcolony_didFinishVideo += GetAdReward;
 
-//		StartCoroutine( LoadSocialSkin() );
+		StartCoroutine( LoadSocialSkin() );
 	}
 	
 	public void GainCoins(int amount)
@@ -134,7 +134,7 @@ public class MenuManager : MonoBehaviour {
 
 					SetCoinsDisplay(c);
 					pcScript.UpdateSkin(name);
-//					StartCoroutine( UpdateSocialSkin(name) );
+					StartCoroutine( UpdateSocialSkin(name) );
 					shopShelf.transform.Find(name+"/priceBlocker").gameObject.SetActive(false);
 					SetMenuFCT(shopShelf.transform.Find(name+"/priceBlocker").position,shopItems[name]);
 				}
@@ -147,7 +147,7 @@ public class MenuManager : MonoBehaviour {
 			else
 			{
 				pcScript.UpdateSkin(name);
-//				StartCoroutine( UpdateSocialSkin(name) );
+				StartCoroutine( UpdateSocialSkin(name) );
 			}
 		}
 		else
@@ -161,7 +161,7 @@ public class MenuManager : MonoBehaviour {
 	{
 		//pull character art from sprite sheet. Assigned in order of appearance
 		string pathPrefix = "Skins/upLevel-character-";
-		string skinName = PlayerPrefs.GetString("selectedSkin","boxer");
+		string skinName = PlayerPrefs.GetString("selectedSkin","viking");
 		string fullPath = pathPrefix+skinName;
 		Sprite[] skinData = Resources.LoadAll<Sprite>(fullPath);
 		yield return new WaitForSeconds(0.25f);

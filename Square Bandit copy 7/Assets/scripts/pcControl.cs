@@ -138,7 +138,7 @@ public class pcControl : MonoBehaviour {
 	{
 		//pull character art from sprite sheet. Assigned in order of appearance
 		string pathPrefix = "Skins/upLevel-character-";
-		string skinName = PlayerPrefs.GetString("selectedSkin","boxer");
+		string skinName = PlayerPrefs.GetString("selectedSkin","viking");
 		string fullPath = pathPrefix+skinName;
 //		fullPath = "upLevel-character-viking";
 		Sprite[] skinData = Resources.LoadAll<Sprite>(fullPath);
@@ -302,15 +302,11 @@ public class pcControl : MonoBehaviour {
 						//check water or space biome
 						if(weightless)
 						{
-							
+							WeightlessJump();
 						}
 						else if(canJump)
 						{
-							if(weightless)
-							{
-								WeightlessJump();
-							}
-							else Jump();
+							Jump();
 						}
 						else
 						{
@@ -546,6 +542,7 @@ public class pcControl : MonoBehaviour {
 		thisRigidbody.velocity = zeroVector;
 
 		transform.position = cannon.position;
+		anim.Play("pc_Jump");
 
 
 	}

@@ -26,25 +26,25 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 	private static string kProductNameGooglePlayNonConsumable = "com.unity3d.test.services.purchasing.nonconsumable";     // Google Play Store identifier for the non-consumable product.
 	private static string kProductNameGooglePlaySubscription =  "com.unity3d.test.services.purchasing.subscription";  // Google Play Store identifier for the subscription product.
 
-	private static string product_homer = "homer";
-	private static string product_homer_appleID = "kbl_homer";
-	private static string product_homer_googleID = "kbl_homer";
-	private static string product_homer_amazonID = "kbl_homer";
+	private static string product_removeads = "removeads";
+	private static string product_removeads_appleID = "ll_removeads";
+	private static string product_removeads_googleID = "ll_removeads";
+	private static string product_removeads_amazonID = "ll_removeads";
 
-	private static string product_queensGuard = "queens guard";
-	private static string product_queensGuard_appleID = "kbl_queens_guard";
-	private static string product_queensGuard_googleID = "kbl_queens_guard";
-	private static string product_queensGuard_amazonID = "kbl_queens_guard";
+	private static string product_goldpack1 = "goldpack1";
+	private static string product_goldpack1_appleID = "ll_goldpack1";
+	private static string product_goldpack1_googleID = "ll_goldpack1";
+	private static string product_goldpack1_amazonID = "ll_goldpack1";
 
-	private static string product_ronaldo = "ronaldo";
-	private static string product_ronaldo_appleID = "kbl_ronaldo";
-	private static string product_ronaldo_googleID = "kbl_ronaldo";
-	private static string product_ronaldo_amazonID = "kbl_ronaldo";
+	private static string product_goldpack2 = "goldpack2";
+	private static string product_goldpack2_appleID = "ll_goldpack2";
+	private static string product_goldpack2_googleID = "ll_goldpack2";
+	private static string product_goldpack2_amazonID = "ll_goldpack2";
 
-	private static string product_doge = "doge";
-	private static string product_doge_appleID = "kbl_doge";
-	private static string product_doge_googleID = "kbl_doge";
-	private static string product_doge_amazonID = "kbl_doge";
+	private static string product_goldpack3 = "goldpack3";
+	private static string product_goldpack3_appleID = "ll_goldpack3";
+	private static string product_goldpack3_googleID = "ll_goldpack3";
+	private static string product_goldpack3_amazonID = "ll_goldpack3";
 
 	private static string product_becks = "becks";
 	private static string product_becks_appleID = "kbl_becks";
@@ -148,17 +148,17 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 		var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
 
 		// Add a product to sell / restore by way of its identifier, associating the general identifier with its store-specific identifiers.
-		builder.AddProduct(product_homer, ProductType.NonConsumable, new IDs(){{ product_homer_appleID, AppleAppStore.Name },{ product_homer_googleID,  GooglePlay.Name },{ product_homer_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_queensGuard, ProductType.NonConsumable, new IDs(){{ product_queensGuard_appleID, AppleAppStore.Name },{ product_queensGuard_googleID,  GooglePlay.Name },{ product_queensGuard_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_ronaldo, ProductType.NonConsumable, new IDs(){{ product_ronaldo_appleID, AppleAppStore.Name },{ product_ronaldo_googleID,  GooglePlay.Name },{ product_ronaldo_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_doge, ProductType.NonConsumable, new IDs(){{ product_doge_appleID, AppleAppStore.Name },{ product_doge_googleID,  GooglePlay.Name },{ product_doge_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_becks, ProductType.NonConsumable, new IDs(){{ product_becks_appleID, AppleAppStore.Name },{ product_becks_googleID,  GooglePlay.Name },{ product_becks_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_karot, ProductType.NonConsumable, new IDs(){{ product_karot_appleID, AppleAppStore.Name },{ product_karot_googleID,  GooglePlay.Name },{ product_karot_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_sanik, ProductType.NonConsumable, new IDs(){{ product_sanik_appleID, AppleAppStore.Name },{ product_sanik_googleID,  GooglePlay.Name },{ product_sanik_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_hop_hop_ninja, ProductType.NonConsumable, new IDs(){{ product_hop_hop_ninja_appleID, AppleAppStore.Name },{ product_hop_hop_ninja_googleID,  GooglePlay.Name },{ product_hop_hop_ninja_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_merica, ProductType.NonConsumable, new IDs(){{ product_merica_appleID, AppleAppStore.Name },{ product_merica_googleID,  GooglePlay.Name },{ product_merica_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_pepe, ProductType.NonConsumable, new IDs(){{ product_pepe_appleID, AppleAppStore.Name },{ product_pepe_googleID,  GooglePlay.Name },{ product_pepe_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_fullGame, ProductType.NonConsumable, new IDs(){{ product_fullGame_appleID, AppleAppStore.Name },{ product_fullGame_googleID,  GooglePlay.Name },{ product_fullGame_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_removeads, ProductType.NonConsumable, new IDs(){{ product_removeads_appleID, AppleAppStore.Name },{ product_removeads_googleID,  GooglePlay.Name },{ product_removeads_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_goldpack1, ProductType.NonConsumable, new IDs(){{ product_goldpack1_appleID, AppleAppStore.Name },{ product_goldpack1_googleID,  GooglePlay.Name },{ product_goldpack1_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_goldpack2, ProductType.NonConsumable, new IDs(){{ product_goldpack2_appleID, AppleAppStore.Name },{ product_goldpack2_googleID,  GooglePlay.Name },{ product_goldpack2_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_goldpack3, ProductType.NonConsumable, new IDs(){{ product_goldpack3_appleID, AppleAppStore.Name },{ product_goldpack3_googleID,  GooglePlay.Name },{ product_goldpack3_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_becks, ProductType.NonConsumable, new IDs(){{ product_becks_appleID, AppleAppStore.Name },{ product_becks_googleID,  GooglePlay.Name },{ product_becks_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_karot, ProductType.NonConsumable, new IDs(){{ product_karot_appleID, AppleAppStore.Name },{ product_karot_googleID,  GooglePlay.Name },{ product_karot_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_sanik, ProductType.NonConsumable, new IDs(){{ product_sanik_appleID, AppleAppStore.Name },{ product_sanik_googleID,  GooglePlay.Name },{ product_sanik_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_hop_hop_ninja, ProductType.NonConsumable, new IDs(){{ product_hop_hop_ninja_appleID, AppleAppStore.Name },{ product_hop_hop_ninja_googleID,  GooglePlay.Name },{ product_hop_hop_ninja_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_merica, ProductType.NonConsumable, new IDs(){{ product_merica_appleID, AppleAppStore.Name },{ product_merica_googleID,  GooglePlay.Name },{ product_merica_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_pepe, ProductType.NonConsumable, new IDs(){{ product_pepe_appleID, AppleAppStore.Name },{ product_pepe_googleID,  GooglePlay.Name },{ product_pepe_amazonID,  AmazonApps.Name }});
+//		builder.AddProduct(product_fullGame, ProductType.NonConsumable, new IDs(){{ product_fullGame_appleID, AppleAppStore.Name },{ product_fullGame_googleID,  GooglePlay.Name },{ product_fullGame_amazonID,  AmazonApps.Name }});
 
 
 
@@ -176,7 +176,7 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 
 	public void RequestPrice(string product)
 	{
-		if(didGetPrice != null)
+		if(didGetPrice != null && IsInitialized())
 		{
 			didGetPrice(product, m_StoreController.products.WithID(product).metadata.localizedPriceString);
 		}

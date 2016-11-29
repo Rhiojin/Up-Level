@@ -188,6 +188,8 @@ public class levelManager : MonoBehaviour {
 			PlayerPrefs.SetInt("highscore",score);
 		}
 
+		PlayerPrefs.SetInt("lastscore", score);
+
 	}
 //
 //	IEnumerator FadeDelay()

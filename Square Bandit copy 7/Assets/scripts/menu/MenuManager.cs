@@ -25,7 +25,9 @@ public class MenuManager : MonoBehaviour {
 	public SpriteRenderer pcBody;
 	public Text coinsText;
 	public Text coinsTextStore;
+	public Text coinsTextIAP;
 	public Text highScoreText;
+	public Text highScoreShareText;
 
 	public Dictionary<string, int> shopItems = new Dictionary<string, int>();
 	public Transform shopShelf;
@@ -44,6 +46,11 @@ public class MenuManager : MonoBehaviour {
 	public Image handsR;
 	public Image legsL;
 	public Image legsR;
+
+	public Text removeAdsPrice;
+	public Text gp1price;
+	public Text gp2price;
+	public Text gp3price;
 
 	void Awake()
 	{
@@ -88,10 +95,51 @@ public class MenuManager : MonoBehaviour {
 		SetHighScoreDisplay(PlayerPrefs.GetInt("highscore",0));
 
 		AdManager._Adcolony_didFinishVideo += GetAdReward;
+		IAPmanager.instance.didGetPrice += SetPrices;
+		IAPmanager.instance.didReadyStore += RequestPrices;
 
 		StartCoroutine( LoadSocialSkin() );
-	}
 	
+	}
+
+	public void RequestPrices()
+	{
+		IAPmanager.instance.RequestPrice("removeads");
+		IAPmanager.instance.RequestPrice("goldpack1");
+		IAPmanager.instance.RequestPrice("goldpack2");
+		IAPmanager.instance.RequestPrice("goldpack3");
+	}
+
+	public void SetPrices(string product, string price)
+	{
+		switch(product)
+		{
+		case("removeads"):
+			{
+				removeAdsPrice.text = price;
+			}
+			break;
+
+		case("goldpack1"):
+			{
+				gp1price.text = price;
+			}
+			break;
+
+		case("goldpack2"):
+			{
+				gp2price.text = price;
+			}
+			break;
+
+		case("goldpack3"):
+			{
+				gp3price.text = price;
+			}
+			break;
+		}
+	}
+
 	public void GainCoins(int amount)
 	{
 		int c = PlayerPrefs.GetInt("coins",0);
@@ -112,11 +160,13 @@ public class MenuManager : MonoBehaviour {
 	{
 		coinsText.text = amount.ToString();
 		coinsTextStore.text = coinsText.text;
+		coinsTextIAP.text = coinsText.text;
 	}
 
 	void SetHighScoreDisplay(int amount)
 	{
 		highScoreText.text = amount.ToString();
+		highScoreShareText.text = highScoreText.text;
 	}
 
 	public void SetSkin(string name)

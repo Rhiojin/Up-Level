@@ -212,26 +212,30 @@ public class nativeAPImanager : MonoBehaviour {
 		#endif
 	}
 
-	public void ShareTrophyRoom(string network)
+	public void ShareTrophyRoom(string network = "null")
 	{
 		print("starting save");
-		StartCoroutine( SaveShot(network) );
+		StartCoroutine( SaveShot() );
 
 	}
 
-	void FinishImageShare(string network)
+	void FinishImageShare(string network = "null")
 	{
-		string msg = "Check out my awesome stats in #kickballlegend!";
+		string msg = "I just scored "+ PlayerPrefs.GetInt("lastscore",0).ToString() +" in #leaplevel!";
 		#if UNITY_EDITOR
 		#endif
 		#if UNITY_IOS
 		if(network == "facebook")
 		{
-			_ShareToFacebook("Check out my awesome stats in #kickballlegend!");
+			_ShareToFacebook(msg);
+		}
+		else if(network == "twitter")
+		{
+			_ShareToTwitter(msg);
 		}
 		else
 		{
-			_ShareToTwitter("Check out my awesome stats in #kickballlegend!");
+			//generic share incs
 		}
 		#elif UNITY_ANDROID
 		using (AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -273,9 +277,9 @@ public class nativeAPImanager : MonoBehaviour {
 		#endif
 	}
 
-	IEnumerator SaveShot(string network)
+	IEnumerator SaveShot(string network = "null")
 	{
-
+		AdManager.Admob_HideABannerAd();
 		yield return new WaitForEndOfFrame();
 		yield return new WaitForEndOfFrame();
 
@@ -345,7 +349,8 @@ public class nativeAPImanager : MonoBehaviour {
 		//Tell user that image is saved to album
 		print("shot saved");
 
-		FinishImageShare(network);
+		FinishImageShare();
+		AdManager.Admob_ShowBannerAd();
 	}
 
 	void DeleteImage()

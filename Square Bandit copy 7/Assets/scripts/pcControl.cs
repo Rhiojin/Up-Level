@@ -31,6 +31,7 @@ public class pcControl : MonoBehaviour {
 	bool ButtStomping = false;
 	bool ShoulderBashing = false;
 	bool toggling = false;
+	bool inDonkeyCannon = false;
 	bool donkeyCannoning = false;
 	bool weightless = false;
 	bool isFacingRight = false;
@@ -537,6 +538,7 @@ public class pcControl : MonoBehaviour {
 
 	void EnterDonkeyCannon()
 	{
+		inDonkeyCannon = true;
 		donkeyCannoning = true;
 		thisRigidbody.gravityScale = 0;
 		thisRigidbody.velocity = zeroVector;
@@ -548,6 +550,7 @@ public class pcControl : MonoBehaviour {
 	}
 	IEnumerator DonkeyCannonShot()
 	{
+		inDonkeyCannon = false;
 		donkeyCannoning = false;
 		rocketParticle.Play();
 		thisBody.SetActive(true);
@@ -558,7 +561,6 @@ public class pcControl : MonoBehaviour {
 		thisRigidbody.gravityScale = maxGravity;
 		yield return new WaitForSeconds(0.3f);
 		cannonCollider.enabled = true;
-
 		yield return new WaitForSeconds(1.7f);
 
 		rocketParticle.Stop();

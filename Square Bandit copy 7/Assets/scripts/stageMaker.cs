@@ -32,6 +32,7 @@ public class stageMaker : MonoBehaviour {
 	public GameObject[] groundHazards;
 	public GameObject[] airHazards;
 	public GameObject[] npcHazards;
+	public GameObject[] aerialNpcHazards;
 	public GameObject coinBunch;
 
 
@@ -214,13 +215,37 @@ public class stageMaker : MonoBehaviour {
 				}
 				break;
 
-			case(2):
-				{
-					randomizer = Random.Range(0,npcHazards.Length);
-					airHazardSpawnPoint.x = Random.Range(-25, 25);
-					hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
-				}
-				break;
+//			case(2):
+//				{
+//					randomizer = Random.Range(0,npcHazards.Length);
+//					airHazardSpawnPoint.x = Random.Range(-25, 25);
+//					hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+//
+//					randomizer = Random.Range(0,npcHazards.Length);
+//					airHazardSpawnPoint.x = Random.Range(-25, 25);
+//					hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+//
+//					if(Random.value > 0.5f)
+//					{
+//						randomizer = Random.Range(0,aerialNpcHazards.Length);
+//						Instantiate(aerialNpcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0));
+//					}
+//				}
+//				break;
+			}
+
+			randomizer = Random.Range(0,npcHazards.Length);
+			airHazardSpawnPoint.x = Random.Range(-25, 25);
+			hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+
+			randomizer = Random.Range(0,npcHazards.Length);
+			airHazardSpawnPoint.x = Random.Range(-25, 25);
+			hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+
+			if(Random.value > 0.5f)
+			{
+				randomizer = Random.Range(0,aerialNpcHazards.Length);
+				Instantiate(aerialNpcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0));
 			}
 
 //			randomizer = Random.Range(0,groundHazards.Length);

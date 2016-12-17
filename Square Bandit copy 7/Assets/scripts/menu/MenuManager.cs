@@ -451,6 +451,13 @@ public class MenuManager : MonoBehaviour {
 		InvokeRepeating("FadeOut",0.01f, 0.02f);
 		InvokeRepeating("InGameUIFadeIn",0.01f, 0.02f);
 
+		//the LAZY AF way of doing this
+		int p = PlayerPrefs.GetInt("playCount",0);
+		if(p <= 5) //sync number with stagemaker
+		{
+			GameObject obj = GameObject.Find("TutorialCanvasGroup(Clone)");
+			obj.SendMessage("StartFadeIn",SendMessageOptions.DontRequireReceiver);
+		}
 		/*
 		 * logic:
 		 * animate buttons out

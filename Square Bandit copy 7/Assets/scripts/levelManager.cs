@@ -53,34 +53,40 @@ public class levelManager : MonoBehaviour {
 	public CanvasGroup mainMenuGroup;
 	public CanvasGroup InGameGroup;
 	public CanvasGroup gameOverGroup;
+	public CanvasGroup pauseMenuGroup;
 	public MenuManager menuScript;
 	public FCTCanvas fctCanvasScript;
 	public Text coinsText;
 	public Text coinsTextStore;
+	public GameObject singleCoin;
+	public CanvasGroup ingameCoinDisplayGroup;
+	public Text ingameCoinDisplay;
 
 	float fadeTime = 2;
 
 	void Start () 
 	{
-//		InvokeRepeating( "ColorCheck", 0.5f, 0.5f);
 		pcScript = pc.GetComponent<pcControl>();
 		transistionCanvas.instance.StartTransitionOut();
+		ingameCoinDisplay.text = PlayerPrefs.GetInt("coins",0).ToString();
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () 
+	void Update () 
 	{
-//		UpdateSky();
+		FadeCoin();
 	}
 
 	public void Pause()
 	{
+		
 		if(!paused)
 		{
 			if(_didPause != null)
 			{
 				_didPause();
 			}
+			InvokeRepeating("FadeInPauseMenu",0.01f,0.1f);
 		}
 		else
 		{
@@ -88,6 +94,7 @@ public class levelManager : MonoBehaviour {
 			{
 				_didUnpause();
 			}
+			InvokeRepeating("FadeOutPauseMenu",0.01f,0.1f);
 		}
 
 		paused = !paused;
@@ -140,6 +147,60 @@ public class levelManager : MonoBehaviour {
 	{
 		coinsText.text = amount.ToString();
 		coinsTextStore.text = coinsText.text;
+	}
+
+	public void MakeACoin(Vector3 position)
+	{
+		Instantiate(singleCoin, position, singleCoin.transform.rotation);
+	}
+
+	public void GainCoinsIngame(int amount)
+	{
+		int c = PlayerPrefs.GetInt("coins",0);
+		c += amount;
+		PlayerPrefs.SetInt("coins",c);
+		ingameCoinDisplay.text = c.ToString();
+		ingameCoinDisplayGroup.alpha = 1;
+	}
+
+	void FadeCoin()
+	{
+		if(ingameCoinDisplayGroup.alpha >= 0)
+		{
+			ingameCoinDisplayGroup.alpha -= 0.2f*Time.deltaTime*fadeTime;
+		}
+	}
+
+	void FadeInPauseMenu()
+	{
+		CancelInvoke("FadeOutPauseMenu");
+		if(pauseMenuGroup.interactable == false)pauseMenuGroup.interactable = true;
+		if(pauseMenuGroup.alpha < 1)
+		{
+			pauseMenuGroup.alpha += 5*Time.deltaTime*fadeTime;
+			if(pauseMenuGroup.alpha >= 1) 
+			{
+					
+				pauseMenuGroup.blocksRaycasts = true;
+				CancelInvoke("FadeInPauseMenu");
+			}
+		}
+	}
+
+	void FadeOutPauseMenu()
+	{
+		CancelInvoke("FadeInPauseMenu");
+		if(pauseMenuGroup.interactable == true)pauseMenuGroup.interactable = false;
+		if(pauseMenuGroup.alpha > 0)
+		{
+			pauseMenuGroup.alpha -= 5*Time.deltaTime*fadeTime;
+			if(pauseMenuGroup.alpha <= 0) 
+			{
+
+				pauseMenuGroup.blocksRaycasts = true;
+				CancelInvoke("FadeOutPauseMenu");
+			}
+		}
 	}
 
 

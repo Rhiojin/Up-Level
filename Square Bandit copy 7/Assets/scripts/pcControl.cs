@@ -334,7 +334,7 @@ public class pcControl : MonoBehaviour {
 						{
 							if(touchCurrent.x > touchStart.x) 
 							{
-								if(isFacingRight)
+								if(isFacingRight && Mathf.Abs(touchCurrent.x - touchStart.x) > 5)
 								{
 									if(!ShoulderBashing)StartCoroutine( ShoulderBash() );
 								}
@@ -345,7 +345,7 @@ public class pcControl : MonoBehaviour {
 							}
 							else
 							{
-								if(!isFacingRight)
+								if(!isFacingRight && Mathf.Abs(touchCurrent.x - touchStart.x) > 5)
 								{
 									if(!ShoulderBashing) StartCoroutine( ShoulderBash() );
 								}
@@ -357,7 +357,7 @@ public class pcControl : MonoBehaviour {
 						}
 						else
 						{
-							if(!ButtStomping && !canJump) StartCoroutine( ButtStomp() );
+						if(!ButtStomping && !canJump && Mathf.Abs(touchCurrent.y - touchStart.y) > 10) StartCoroutine( ButtStomp() );
 						}
 					}
 
@@ -548,6 +548,7 @@ public class pcControl : MonoBehaviour {
 
 
 	}
+
 	IEnumerator DonkeyCannonShot()
 	{
 		inDonkeyCannon = false;
@@ -620,7 +621,6 @@ public class pcControl : MonoBehaviour {
 //			else if(RocketBoosting) camScript.StartScreenShake();
 			if(!canJump && !weightless || ShoulderBashing)
 			{
-				print("running");
 				anim.Play("pc_Run");
 			}
 			canJump = true;
@@ -695,12 +695,11 @@ public class pcControl : MonoBehaviour {
 		{
 			if(ButtStomping)
 			{
-				ButtStomping = false;
 				RocketBoosting = false;
 			//	rocketParticle.Stop();
 				Destroy(colEnt.collider.gameObject);
 				thisRigidbody.velocity = zeroVector;
-				thisRigidbody.AddForce(upVector*jumpForce);
+				thisRigidbody.AddForce(upVector*jumpForce/1.5f);
 				camScript.StartCamRock(transform.position.x);
 				stompParticle.Emit(5);
 				stompParticle.Stop();
@@ -722,15 +721,30 @@ public class pcControl : MonoBehaviour {
 
 			}
 
-			if(!canJump)
+			if(ShoulderBashing)
 			{
-				//ButtStomping = false;
-				//RocketBoosting = false;
 				Destroy(colEnt.collider.gameObject);
-				thisRigidbody.velocity = zeroVector;
-				//				thisRigidbody.AddForce(-upVector*jumpForce);
+				
+				camScript.StartCamRock(transform.position.x);
+				breakParticle.transform.position = colEnt.transform.position;
+				breakParticle.Emit(10);
+				breakParticle.Stop();
 			}
-			levelScript.Scored(2);
+
+			if(!ButtStomping && !canJump)
+			{
+				anim.Play("pc_Run");
+				canJump = true;
+				RocketBoosting = false;
+			}
+			if(ButtStomping || RocketBoosting || ShoulderBashing)
+			{
+				if(Random.value > 0.6f)
+				{
+					levelScript.MakeACoin(colEnt.collider.transform.position);
+				}
+				levelScript.Scored(2);
+			}
 		
 		}
 
@@ -786,7 +800,7 @@ public class pcControl : MonoBehaviour {
 		{
 			soundManager.instance.PlayClip("coinSound", 0.5f);
 			Destroy(col.gameObject);
-			levelScript.GainCoins(1);
+			levelScript.GainCoinsIngame(1);
 
 		}
 

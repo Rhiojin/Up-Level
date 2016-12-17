@@ -3,11 +3,19 @@ using System.Collections;
 
 public class stageMaker : MonoBehaviour {
 
+	public GameObject tutorialCanvasGroup;
+	public GameObject tutorialPlatform;
+	public GameObject tutorialPlatformButt;
+	public GameObject tutorialPlatformPunch;
+	public GameObject tutorialPlatformRocket;
 	public GameObject platform;
 	public GameObject platformLong;
 	public GameObject platformLongBreakables;
 	public GameObject platformLongDonkeyCannon;
 	public GameObject platformLongWater;
+
+	public GameObject[] bonusRooms;
+
 	public GameObject platformBossRoom;
 	public GameObject Light2D;
 
@@ -17,7 +25,7 @@ public class stageMaker : MonoBehaviour {
 	float longPlatformDelta = 90; //100 - 10
 
 	int floorCount = 0;
-	int floorMax = 4; //4
+	int floorMax = 3; //4
 
 	int lightCount = 0;
 	int lightCountMax = 1;
@@ -26,7 +34,7 @@ public class stageMaker : MonoBehaviour {
 
 	GameObject platformHolder;
 	GameObject hazardHolder;
-	int difficulty = 1;
+	int difficulty = 0;
 
 
 	public GameObject[] groundHazards;
@@ -41,6 +49,7 @@ public class stageMaker : MonoBehaviour {
 	Vector3 midSpawnPoint = new Vector3(0, 40, 0);
 	int randomizer = 0;
 	bool longSpawn = false;
+	bool coinRoomSpawn = false;
 
 	Vector3 originalSpawnPoint;
 	Vector3 originalGroundSpawnPoint;
@@ -58,14 +67,20 @@ public class stageMaker : MonoBehaviour {
 		originalGroundSpawnPoint = groundHazardSpawnPoint;
 		originalAirSpawnPoint = airHazardSpawnPoint;
 
-		InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
+		int p = PlayerPrefs.GetInt("playCount",0);
+		if(p <= 5)
+		{
+			p++;
+			PlayerPrefs.SetInt("playCount",p);
+			InvokeRepeating("SpawnTutorialPlatform", 0.1f, 0.1f);
+			Instantiate(tutorialCanvasGroup, Vector3.zero, tutorialCanvasGroup.transform.rotation);
+		}
+		else
+		{
+			difficulty = 1;
+			InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
+		}
 		SpawnLight();
-	}
-	
-
-	void Update () {
-	
-	
 	}
 
 	public void Reset()
@@ -77,22 +92,78 @@ public class stageMaker : MonoBehaviour {
 		floorCount = 0;
 	}
 
-	void SpawnPlatform()
+	void SpawnTutorialPlatform()
 	{
-		//spawnPoint.x = Random.Range(-xRange, xRange);
+		if(difficulty >= 5)
+		{
+			CancelInvoke("SpawnTutorialPlatform");
+			InvokeRepeating("SpawnPlatform", 0.1f, 0.1f);
+			return;
+		}
 
 		if(floorCount < floorMax)
 		{
 			longSpawn = false;
 			spawnPoint.y += delta;
 
-			//decide platform based on difficulty
+			switch(difficulty)
+			{
+			case(0):
+				{
+					platformHolder = Instantiate(tutorialPlatformRocket, spawnPoint, platform.transform.rotation) as GameObject;
+				}
+				break;
+			case(1):
+				{
+					platformHolder = Instantiate(tutorialPlatform, spawnPoint, platform.transform.rotation) as GameObject;
+				}
+				break;
+			case(2):
+				{
+					platformHolder = Instantiate(tutorialPlatformPunch, spawnPoint, platform.transform.rotation) as GameObject;
+				}
+				break;
+			case(3):
+				{
+					platformHolder = Instantiate(tutorialPlatformButt, spawnPoint, platform.transform.rotation) as GameObject;
+				}
+				break;
+			default:
+				{
+					platformHolder = Instantiate(platform, spawnPoint, platform.transform.rotation) as GameObject;
+				}
+				break;
+			}
+
+
+
+			floorCount++;
+			difficulty++;
+
+			groundHazardSpawnPoint.y += delta;
+			airHazardSpawnPoint.y += delta;
+		}
+
+
+
+	}
+
+	void SpawnPlatform()
+	{
+
+		if(floorCount < floorMax)
+		{
+			longSpawn = false;
+			coinRoomSpawn = false;
+			spawnPoint.y += delta;
+
+			//decide and spawn platform based on difficulty
 
 			int p = 0;
 			if(difficulty%5 == 0)
 			{
 				// select a platform other than the first every 5 levels
-				p = Random.Range(1,5);
+				p = Random.Range(1,6);
 			}
 			else p = 0;
 
@@ -115,7 +186,6 @@ public class stageMaker : MonoBehaviour {
 				{
 					spawnPoint.y += longPlatformDelta;
 					platformHolder = Instantiate(platformLong, spawnPoint, platform.transform.rotation) as GameObject;
-//					floorCount+=2;
 					floorCount++;
 
 					difficulty++;
@@ -140,7 +210,7 @@ public class stageMaker : MonoBehaviour {
 				}
 				break;
 
-			case(3):
+			case(3): //donkey cannons
 				{
 					spawnPoint.y += longPlatformDelta;
 					platformHolder = Instantiate(platformLongDonkeyCannon, spawnPoint, platform.transform.rotation) as GameObject;
@@ -154,7 +224,7 @@ public class stageMaker : MonoBehaviour {
 				}
 				break;
 
-			case(4):
+			case(4): //water room
 				{
 					spawnPoint.y += longPlatformDelta;
 					platformHolder = Instantiate(platformLongWater, spawnPoint, platform.transform.rotation) as GameObject;
@@ -165,6 +235,30 @@ public class stageMaker : MonoBehaviour {
 					groundHazardSpawnPoint.y += longPlatformDelta+delta;
 					airHazardSpawnPoint.y += longPlatformDelta+delta;
 					longSpawn = true;
+				}
+				break;
+
+			case(5): //coin room
+				{
+					if(Random.value > 0.7f)
+					{
+						platformHolder = Instantiate(bonusRooms[Random.Range(0,bonusRooms.Length)], spawnPoint, platform.transform.rotation) as GameObject;
+						floorCount++;
+						difficulty++;
+						coinRoomSpawn = true;
+					}
+					else
+					{
+						spawnPoint.y += longPlatformDelta;
+						platformHolder = Instantiate(platformLongBreakables, spawnPoint, platform.transform.rotation) as GameObject;
+						floorCount++;
+
+						difficulty++;
+						spawnPoint.y += delta;
+						groundHazardSpawnPoint.y += longPlatformDelta+delta;
+						airHazardSpawnPoint.y += longPlatformDelta+delta;
+						longSpawn = true;
+					}
 				}
 				break;
 
@@ -195,70 +289,79 @@ public class stageMaker : MonoBehaviour {
 //					c++;
 //				}
 			}
-			switch(c)
-			{
 
-			case(0):
+			if(!coinRoomSpawn)
+			{
+				//add npcs and hazards
+
+				//Hazards
+				switch(c)
 				{
-					randomizer = Random.Range(0,groundHazards.Length);
-					groundHazardSpawnPoint.x = Random.Range(-25, 25);
-					hazardHolder = Instantiate(groundHazards[randomizer], groundHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+
+				case(0):
+					{
+						randomizer = Random.Range(0,groundHazards.Length);
+						groundHazardSpawnPoint.x = Random.Range(-25, 25);
+						hazardHolder = Instantiate(groundHazards[randomizer], groundHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+
+					}
+					break;
+
+				case(1):
+					{
+						randomizer = Random.Range(0,airHazards.Length);
+						airHazardSpawnPoint.x = Random.Range(-25, 25);
+						hazardHolder = Instantiate(airHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+					}
+					break;
 
 				}
-				break;
 
-			case(1):
+				//NPCS
+
+				int count = 1;
+				if(difficulty<10)
 				{
-					randomizer = Random.Range(0,airHazards.Length);
-					airHazardSpawnPoint.x = Random.Range(-25, 25);
-					hazardHolder = Instantiate(airHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
+					count = 1;
 				}
-				break;
+				else if(difficulty>11 && difficulty<20)
+				{
+					count = 2;
+				}
+				else if(difficulty>21)
+				{
+					count = 3;
+				}
+				SpawnNpc(count);
 
-//			case(2):
-//				{
-//					randomizer = Random.Range(0,npcHazards.Length);
-//					airHazardSpawnPoint.x = Random.Range(-25, 25);
-//					hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
-//
-//					randomizer = Random.Range(0,npcHazards.Length);
-//					airHazardSpawnPoint.x = Random.Range(-25, 25);
-//					hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
-//
-//					if(Random.value > 0.5f)
-//					{
-//						randomizer = Random.Range(0,aerialNpcHazards.Length);
-//						Instantiate(aerialNpcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0));
-//					}
-//				}
-//				break;
+				groundHazardSpawnPoint.y += delta;
+				airHazardSpawnPoint.y += delta;
 			}
-
-			randomizer = Random.Range(0,npcHazards.Length);
-			airHazardSpawnPoint.x = Random.Range(-25, 25);
-			hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
-
-			randomizer = Random.Range(0,npcHazards.Length);
-			airHazardSpawnPoint.x = Random.Range(-25, 25);
-			hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
-
-			if(Random.value > 0.5f)
-			{
-				randomizer = Random.Range(0,aerialNpcHazards.Length);
-				Instantiate(aerialNpcHazards[randomizer], airHazardSpawnPoint, new Quaternion(0,0,0,0));
-			}
-
-//			randomizer = Random.Range(0,groundHazards.Length);
-//			groundHazardSpawnPoint.x = Random.Range(-25, 25);
-//			hazardHolder = Instantiate(groundHazards[randomizer], groundHazardSpawnPoint, new Quaternion(0,0,0,0)) as GameObject;
-		
-
-			groundHazardSpawnPoint.y += delta;
-			airHazardSpawnPoint.y += delta;
 
 		}
 
 
+	}
+
+	void SpawnNpc(int count)
+	{
+		for(int i = 1; i <= count; i++)
+		{
+			if(Random.value > 0.75f)
+			{
+				//aerial npc
+				randomizer = Random.Range(0,aerialNpcHazards.Length);
+				Instantiate(aerialNpcHazards[randomizer], airHazardSpawnPoint+aerialNpcHazards[randomizer].transform.right, new Quaternion(0,0,0,0));
+			}
+			else
+			{
+				//ground npc
+				randomizer = Random.Range(0,npcHazards.Length);
+				airHazardSpawnPoint.x = Random.Range(-25, 25);
+				hazardHolder = Instantiate(npcHazards[randomizer], airHazardSpawnPoint-Vector3.up, new Quaternion(0,0,0,0)) as GameObject;
+			}
+
+		}
 	}
 
 	void SpawnLight()

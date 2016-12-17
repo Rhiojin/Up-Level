@@ -1,7 +1,29 @@
-﻿using UnityEngine;
+﻿/****************************************************************************
+ Copyright (c) 2014 Martin Ysa
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;		// This allows for the use of lists, like <GameObject>
-using pseudoSinCos;
+//using pseudoSinCos;
 
 
 public class verts
@@ -20,7 +42,7 @@ public class DynamicLight : MonoBehaviour {
 
 	// Public variables
 
-	public string version = "1.0.3"; //release date 31/01/2016
+	public string version = "1.0.4"; //release date 31/01/2016
 
 	public Material lightMaterial;
 
@@ -34,18 +56,21 @@ public class DynamicLight : MonoBehaviour {
 
 	[Range(4,20)]
 	public int lightSegments = 8;
+
+	public LayerMask layer;
 	
 
 	
 	// Private variables
 	Mesh lightMesh;													// Mesh for our light mesh
-	LayerMask layer;
+
 
 	// Called at beginning of script execution
 	void Start () {
 
-		PseudoSinCos.initPseudoSinCos();
+		TablaSenoCoseno.initSenCos();
 
+		//Debug.Log((int) LayerMask.NameToLayer("Default"));
 
 		
 		//-- Step 1: obtain all active meshes in the scene --//
@@ -62,12 +87,10 @@ public class DynamicLight : MonoBehaviour {
 		lightMesh.MarkDynamic ();
 
 		renderer.sortingLayerName = "lighting";
-
-//		InvokeRepeating("SlowUpdate",0.01f, 0.06f);
 	}
 	
 
-	void LateUpdate(){
+	void Update(){
 
 		getAllMeshes();
 		setLight ();
@@ -76,17 +99,6 @@ public class DynamicLight : MonoBehaviour {
 
 	}
 
-	void SlowUpdate()
-	{
-		getAllMeshes();
-		setLight ();
-	}
-
-//	void FixedUpdate()
-//	{
-//		getAllMeshes();
-//		setLight ();
-//	}
 
 	void getAllMeshes(){
 		//allMeshes = FindObjectsOfType(typeof(PolygonCollider2D)) as PolygonCollider2D[];
@@ -98,8 +110,6 @@ public class DynamicLight : MonoBehaviour {
 		for (int i=0; i<allColl2D.Length; i++) {
 			allMeshes[i] = (PolygonCollider2D)allColl2D[i];
 		}
-
-
 
 	}
 
@@ -116,7 +126,7 @@ public class DynamicLight : MonoBehaviour {
 		allVertices.Clear();// Since these lists are populated every frame, clear them first to prevent overpopulation
 
 	
-		layer = 1 << 8;
+		//layer = 1 << 8;
 
 
 		//--Step 2: Obtain vertices for each mesh --//
@@ -336,7 +346,7 @@ public class DynamicLight : MonoBehaviour {
 
 			verts v = new verts();
 			//v.pos = new Vector3((Mathf.Sin(theta)), (Mathf.Cos(theta)), 0); // in radians low performance
-			v.pos = new Vector3((PseudoSinCos.SinArray[theta]), (PseudoSinCos.CosArray[theta]), 0); // in dregrees (previous calculate)
+			v.pos = new Vector3((TablaSenoCoseno.SenArray[theta]), (TablaSenoCoseno.CosArray[theta]), 0); // in dregrees (previous calculate)
 
 			v.angle = getVectorAngle(true,v.pos.x, v.pos.y);
 			v.pos *= lightRadius;

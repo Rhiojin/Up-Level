@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour {
@@ -52,9 +53,21 @@ public class MenuManager : MonoBehaviour {
 	public Text gp2price;
 	public Text gp3price;
 
+	List<int> listOfPrices = new List<int>();
+	public GameObject theShine;
+	public Image storeButtonImage;
+	public Color storeButtonShineColorOne;
+	public Color storeButtonShineColorTwo;
+	float storeButtonTimer = 0;
+	float storeButtonLerpSpeed = 2f;
+
+	bool shouldShine = false;
+
 	void Awake()
 	{
-		PlayerPrefs.SetInt("coins",10000);
+		Application.targetFrameRate = 60;
+		
+		PlayerPrefs.SetInt("coins",3000);
 		
 		// build shop dict modularly. All that is required for adding a new skin is making the button in the content holder;
 		int childCount = shopShelf.transform.childCount;
@@ -68,20 +81,34 @@ public class MenuManager : MonoBehaviour {
 			if(priceText != null)
 			{
 				shopItems.Add(child.name, price);
-				priceText.GetComponent<Text>().text = price.ToString();;
+
+				priceText.GetComponent<Text>().text = price.ToString();
 				if(PlayerPrefs.GetInt(child.name+"Unlocked",0) == 1)
 				{
 					child.transform.Find("priceBlocker").gameObject.SetActive(false);
+				}
+				else
+				{
+					listOfPrices.Add(price);
 				}
 			}
 			else
 			{
 				Debug.LogWarning(child.name+" does not have a priceblocker");
 			}
-			if(1>0 && i%5 == 0) price+=25;
+
+			if(1>0 && i%5 == 0)
+			{
+				price+=25;
+			}
 
 
 
+		}
+
+		if(listOfPrices.Count > 0)
+		{
+			CheckForPurchaseableSkin();
 		}
 
 	}
@@ -96,10 +123,18 @@ public class MenuManager : MonoBehaviour {
 
 		AdManager._Adcolony_didFinishVideo += GetAdReward;
 		IAPmanager.instance.didGetPrice += SetPrices;
-		IAPmanager.instance.didReadyStore += RequestPrices;
+		IAPmanager.instance.didReadyStore += RequestPrices;	
 
 		StartCoroutine( LoadSocialSkin() );
 	
+	}
+
+	void FixedUpdate()
+	{
+		if(shouldShine)
+		{
+			ShineButton();
+		}
 	}
 
 	public void RequestPrices()
@@ -135,6 +170,37 @@ public class MenuManager : MonoBehaviour {
 		case("goldpack3"):
 			{
 				gp3price.text = price;
+			}
+			break;
+		}
+	}
+
+	public void GetPurchase(string product)
+	{
+		switch(product)
+		{
+		case("removeads"):
+			{
+				PlayerPrefs.SetInt("removedAds",1);
+				AdManager.Admob_HideABannerAd();
+			}
+			break;
+
+		case("goldpack1"):
+			{
+				GainCoins(200);
+			}
+			break;
+
+		case("goldpack2"):
+			{
+				GainCoins(500);
+			}
+			break;
+
+		case("goldpack3"):
+			{
+				GainCoins(900);
 			}
 			break;
 		}
@@ -176,6 +242,7 @@ public class MenuManager : MonoBehaviour {
 		{
 			if(PlayerPrefs.GetInt(name+"Unlocked",0) == 0)
 			{
+				//unlock skin if cash is available
 				if(c >= shopItems[name])
 				{
 					c -= shopItems[name];
@@ -187,6 +254,9 @@ public class MenuManager : MonoBehaviour {
 					StartCoroutine( UpdateSocialSkin(name) );
 					shopShelf.transform.Find(name+"/priceBlocker").gameObject.SetActive(false);
 					SetMenuFCT(shopShelf.transform.Find(name+"/priceBlocker").position,shopItems[name]);
+
+					//pop price from list
+					listOfPrices.Remove(shopItems[name]);
 				}
 				else
 				{
@@ -204,6 +274,30 @@ public class MenuManager : MonoBehaviour {
 		{
 			print("priceblocker not targeting correct skin");
 		}
+
+	}
+
+	void CheckForPurchaseableSkin()
+	{
+		int coins = PlayerPrefs.GetInt("coins",0);
+		if(listOfPrices.Any(o => o <= coins))
+		{
+			shouldShine = true;
+			InvokeRepeating("ShineButton",0.1f,0.05f);
+				
+		}
+	}
+
+	void ShineButton()
+	{
+		storeButtonTimer = Mathf.PingPong(Time.time * storeButtonLerpSpeed, 1.0f);
+		storeButtonImage.color = Color.Lerp(storeButtonShineColorOne, storeButtonShineColorTwo, storeButtonTimer);
+	}
+
+	public void HideShine()
+	{
+		CancelInvoke("ShineButton");
+		shouldShine = false;
 
 	}
 
@@ -353,6 +447,8 @@ public class MenuManager : MonoBehaviour {
 				InGameGroup.interactable = true;
 				InGameGroup.blocksRaycasts = true;
 				CancelInvoke("InGameUIFadeIn");
+				GameObject.Find("Optimizer").GetComponent<optimizer>().StartOptimize();
+				//call optimizer
 			}
 		}
 	}
@@ -446,24 +542,21 @@ public class MenuManager : MonoBehaviour {
 
 	public void NewStart()
 	{
+		CancelInvoke("ShineButton");
+		shouldShine = false;
 		pcScript.gameStarted = true;
 		mainMenuGroup.interactable = false;
 		InvokeRepeating("FadeOut",0.01f, 0.02f);
 		InvokeRepeating("InGameUIFadeIn",0.01f, 0.02f);
 
-		//the LAZY AF way of doing this
+		//the LAZY AF way of doing this - create tutorial
 		int p = PlayerPrefs.GetInt("playCount",0);
 		if(p <= 5) //sync number with stagemaker
 		{
 			GameObject obj = GameObject.Find("TutorialCanvasGroup(Clone)");
 			obj.SendMessage("StartFadeIn",SendMessageOptions.DontRequireReceiver);
 		}
-		/*
-		 * logic:
-		 * animate buttons out
-		 * enable input + pause button
-		 * 
-		 */
+
 	}
 
 	public void StartOver()

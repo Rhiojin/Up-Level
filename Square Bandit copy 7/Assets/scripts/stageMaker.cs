@@ -68,7 +68,7 @@ public class stageMaker : MonoBehaviour {
 		originalAirSpawnPoint = airHazardSpawnPoint;
 
 		int p = PlayerPrefs.GetInt("playCount",0);
-		if(p <= 5)
+		if(p <= 5)//sync with menumanager
 		{
 			p++;
 			PlayerPrefs.SetInt("playCount",p);
@@ -240,7 +240,7 @@ public class stageMaker : MonoBehaviour {
 
 			case(5): //coin room
 				{
-					if(Random.value > 0.7f)
+					if(Random.value > 0.5f)
 					{
 						platformHolder = Instantiate(bonusRooms[Random.Range(0,bonusRooms.Length)], spawnPoint, platform.transform.rotation) as GameObject;
 						floorCount++;

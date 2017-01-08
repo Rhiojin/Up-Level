@@ -10,21 +10,23 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 	public static IAPmanager instance;
 	private static IStoreController m_StoreController;                                                                  // Reference to the Purchasing system.
 	private static IExtensionProvider m_StoreExtensionProvider;                                                         // Reference to store-specific Purchasing subsystems.
+	private IAppleExtensions m_AppleExtensions;
+	private ISamsungAppsExtensions m_SamsungExtensions;
 
 	// Product identifiers for all products capable of being purchased: "convenience" general identifiers for use with Purchasing, and their store-specific identifier counterparts 
 	// for use with and outside of Unity Purchasing. Define store-specific identifiers also on each platform's publisher dashboard (iTunes Connect, Google Play Developer Console, etc.)
 
-	private static string kProductIDConsumable =    "consumable";                                                         // General handle for the consumable product.
-	private static string kProductIDNonConsumable = "nonconsumable";                                                  // General handle for the non-consumable product.
-	private static string kProductIDSubscription =  "subscription";                                                   // General handle for the subscription product.
-
-	private static string kProductNameAppleConsumable =    "com.unity3d.test.services.purchasing.consumable";             // Apple App Store identifier for the consumable product.
-	private static string kProductNameAppleNonConsumable = "com.unity3d.test.services.purchasing.nonconsumable";      // Apple App Store identifier for the non-consumable product.
-	private static string kProductNameAppleSubscription =  "com.unity3d.test.services.purchasing.subscription";       // Apple App Store identifier for the subscription product.
-
-	private static string kProductNameGooglePlayConsumable =    "com.unity3d.test.services.purchasing.consumable";        // Google Play Store identifier for the consumable product.
-	private static string kProductNameGooglePlayNonConsumable = "com.unity3d.test.services.purchasing.nonconsumable";     // Google Play Store identifier for the non-consumable product.
-	private static string kProductNameGooglePlaySubscription =  "com.unity3d.test.services.purchasing.subscription";  // Google Play Store identifier for the subscription product.
+//	private static string kProductIDConsumable =    "consumable";                                                         // General handle for the consumable product.
+//	private static string kProductIDNonConsumable = "nonconsumable";                                                  // General handle for the non-consumable product.
+//	private static string kProductIDSubscription =  "subscription";                                                   // General handle for the subscription product.
+//
+//	private static string kProductNameAppleConsumable =    "com.unity3d.test.services.purchasing.consumable";             // Apple App Store identifier for the consumable product.
+//	private static string kProductNameAppleNonConsumable = "com.unity3d.test.services.purchasing.nonconsumable";      // Apple App Store identifier for the non-consumable product.
+//	private static string kProductNameAppleSubscription =  "com.unity3d.test.services.purchasing.subscription";       // Apple App Store identifier for the subscription product.
+//
+//	private static string kProductNameGooglePlayConsumable =    "com.unity3d.test.services.purchasing.consumable";        // Google Play Store identifier for the consumable product.
+//	private static string kProductNameGooglePlayNonConsumable = "com.unity3d.test.services.purchasing.nonconsumable";     // Google Play Store identifier for the non-consumable product.
+//	private static string kProductNameGooglePlaySubscription =  "com.unity3d.test.services.purchasing.subscription";  // Google Play Store identifier for the subscription product.
 
 	private static string product_removeads = "removeads";
 	private static string product_removeads_appleID = "ll_removeads";
@@ -46,40 +48,40 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 	private static string product_goldpack3_googleID = "ll_goldpack3";
 	private static string product_goldpack3_amazonID = "ll_goldpack3";
 
-	private static string product_becks = "becks";
-	private static string product_becks_appleID = "kbl_becks";
-	private static string product_becks_googleID = "kbl_becks";
-	private static string product_becks_amazonID = "kbl_becks";
-
-	private static string product_karot = "karot";
-	private static string product_karot_appleID = "kbl_karot";
-	private static string product_karot_googleID = "kbl_karot";
-	private static string product_karot_amazonID = "kbl_karot";
-
-	private static string product_sanik = "sanik";
-	private static string product_sanik_appleID = "kbl_sanik";
-	private static string product_sanik_googleID = "kbl_sanik";
-	private static string product_sanik_amazonID = "kbl_sanik";
-
-	private static string product_hop_hop_ninja = "hop hop ninja";
-	private static string product_hop_hop_ninja_appleID = "kbl_hop_hop_ninja";
-	private static string product_hop_hop_ninja_googleID = "kbl_hop_hop_ninja";
-	private static string product_hop_hop_ninja_amazonID = "kbl_hop_hop_ninja";
-
-	private static string product_merica = "merica";
-	private static string product_merica_appleID = "kbl_merica";
-	private static string product_merica_googleID = "kbl_merica";
-	private static string product_merica_amazonID = "kbl_merica";
-
-	private static string product_pepe = "pepe";
-	private static string product_pepe_appleID = "kbl_pepe";
-	private static string product_pepe_googleID = "kbl_pepe";
-	private static string product_pepe_amazonID = "kbl_pepe";
-
-	private static string product_fullGame = "fullGame";
-	private static string product_fullGame_appleID = "kbl_fullGame";
-	private static string product_fullGame_googleID = "kbl_fullgame";
-	private static string product_fullGame_amazonID = "kbl_fullgame";
+//	private static string product_becks = "becks";
+//	private static string product_becks_appleID = "kbl_becks";
+//	private static string product_becks_googleID = "kbl_becks";
+//	private static string product_becks_amazonID = "kbl_becks";
+//
+//	private static string product_karot = "karot";
+//	private static string product_karot_appleID = "kbl_karot";
+//	private static string product_karot_googleID = "kbl_karot";
+//	private static string product_karot_amazonID = "kbl_karot";
+//
+//	private static string product_sanik = "sanik";
+//	private static string product_sanik_appleID = "kbl_sanik";
+//	private static string product_sanik_googleID = "kbl_sanik";
+//	private static string product_sanik_amazonID = "kbl_sanik";
+//
+//	private static string product_hop_hop_ninja = "hop hop ninja";
+//	private static string product_hop_hop_ninja_appleID = "kbl_hop_hop_ninja";
+//	private static string product_hop_hop_ninja_googleID = "kbl_hop_hop_ninja";
+//	private static string product_hop_hop_ninja_amazonID = "kbl_hop_hop_ninja";
+//
+//	private static string product_merica = "merica";
+//	private static string product_merica_appleID = "kbl_merica";
+//	private static string product_merica_googleID = "kbl_merica";
+//	private static string product_merica_amazonID = "kbl_merica";
+//
+//	private static string product_pepe = "pepe";
+//	private static string product_pepe_appleID = "kbl_pepe";
+//	private static string product_pepe_googleID = "kbl_pepe";
+//	private static string product_pepe_amazonID = "kbl_pepe";
+//
+//	private static string product_fullGame = "fullGame";
+//	private static string product_fullGame_appleID = "kbl_fullGame";
+//	private static string product_fullGame_googleID = "kbl_fullgame";
+//	private static string product_fullGame_amazonID = "kbl_fullgame";
 
 	#region DELEGATES
 
@@ -149,9 +151,9 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 
 		// Add a product to sell / restore by way of its identifier, associating the general identifier with its store-specific identifiers.
 		builder.AddProduct(product_removeads, ProductType.NonConsumable, new IDs(){{ product_removeads_appleID, AppleAppStore.Name },{ product_removeads_googleID,  GooglePlay.Name },{ product_removeads_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_goldpack1, ProductType.NonConsumable, new IDs(){{ product_goldpack1_appleID, AppleAppStore.Name },{ product_goldpack1_googleID,  GooglePlay.Name },{ product_goldpack1_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_goldpack2, ProductType.NonConsumable, new IDs(){{ product_goldpack2_appleID, AppleAppStore.Name },{ product_goldpack2_googleID,  GooglePlay.Name },{ product_goldpack2_amazonID,  AmazonApps.Name }});
-		builder.AddProduct(product_goldpack3, ProductType.NonConsumable, new IDs(){{ product_goldpack3_appleID, AppleAppStore.Name },{ product_goldpack3_googleID,  GooglePlay.Name },{ product_goldpack3_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_goldpack1, ProductType.Consumable, new IDs(){{ product_goldpack1_appleID, AppleAppStore.Name },{ product_goldpack1_googleID,  GooglePlay.Name },{ product_goldpack1_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_goldpack2, ProductType.Consumable, new IDs(){{ product_goldpack2_appleID, AppleAppStore.Name },{ product_goldpack2_googleID,  GooglePlay.Name },{ product_goldpack2_amazonID,  AmazonApps.Name }});
+		builder.AddProduct(product_goldpack3, ProductType.Consumable, new IDs(){{ product_goldpack3_appleID, AppleAppStore.Name },{ product_goldpack3_googleID,  GooglePlay.Name },{ product_goldpack3_amazonID,  AmazonApps.Name }});
 //		builder.AddProduct(product_becks, ProductType.NonConsumable, new IDs(){{ product_becks_appleID, AppleAppStore.Name },{ product_becks_googleID,  GooglePlay.Name },{ product_becks_amazonID,  AmazonApps.Name }});
 //		builder.AddProduct(product_karot, ProductType.NonConsumable, new IDs(){{ product_karot_appleID, AppleAppStore.Name },{ product_karot_googleID,  GooglePlay.Name },{ product_karot_amazonID,  AmazonApps.Name }});
 //		builder.AddProduct(product_sanik, ProductType.NonConsumable, new IDs(){{ product_sanik_appleID, AppleAppStore.Name },{ product_sanik_googleID,  GooglePlay.Name },{ product_sanik_amazonID,  AmazonApps.Name }});
@@ -183,10 +185,11 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 
 	}
 
-	public void BuyConsumable()
+	public void BuyConsumable(string product)
 	{
 		// Buy the consumable product using its general identifier. Expect a response either through ProcessPurchase or OnPurchaseFailed asynchronously.
-		BuyProductID(kProductIDConsumable);
+		BuyProductID(product);
+		if(nativeAPImanager.instance) nativeAPImanager.instance.ShowAlert("loading...");
 	}
 
 
@@ -201,7 +204,7 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 	public void BuySubscription()
 	{
 		// Buy the subscription product using its the general identifier. Expect a response either through ProcessPurchase or OnPurchaseFailed asynchronously.
-		BuyProductID(kProductIDSubscription);
+//		BuyProductID(kProductIDSubscription);
 	}
 
 
@@ -290,6 +293,9 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 		// Purchasing has succeeded initializing. Collect our Purchasing references.
 		Debug.Log("OnInitialized: PASS");
 
+		m_AppleExtensions = extensions.GetExtension<IAppleExtensions> ();
+		m_SamsungExtensions = extensions.GetExtension<ISamsungAppsExtensions> ();
+		m_AppleExtensions.RegisterPurchaseDeferredListener(OnDeferred);
 		// Overall Purchasing system, configured with products for this application.
 		m_StoreController = controller;
 		// Store specific subsystem, for accessing device-specific store features.
@@ -301,6 +307,11 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 		}
 	}
 
+	private void OnDeferred(Product item)
+	{
+		Debug.Log("Purchase deferred: " + item.definition.id);
+		nativeAPImanager.instance.ShowAlert("Apple's Ask to buy feature has deferred this purchase. Please check with your 'family circle' organizer");
+	}
 
 	public void OnInitializeFailed(InitializationFailureReason error)
 	{
@@ -313,18 +324,9 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 	{
 		// A consumable product has been purchased by this user.
 		print("product recieved "+args.purchasedProduct.definition.id);
-
-		if(String.Equals(args.purchasedProduct.definition.id, product_fullGame, StringComparison.Ordinal))
+		if(didCompletePurchase != null)
 		{
-			print("sending out full game");
-			if(didBuyFullGame != null)
-			{
-				didBuyFullGame();
-			}
-		}
-		else if(didCompletePurchase != null)
-		{
-			print("sending out pack: "+args.purchasedProduct.definition.id);
+			print("sending out IAP: "+args.purchasedProduct.definition.id);
 			didCompletePurchase(args.purchasedProduct.definition.id);
 		}
 		else print("no methods subbed to purchasing delegate");
@@ -360,59 +362,8 @@ public class IAPmanager : MonoBehaviour , IStoreListener
 	{
 		// A product purchase attempt did not succeed. Check failureReason for more detail. Consider sharing this reason with the user.
 		Debug.Log(string.Format("OnPurchaseFailed: FAIL. Product: '{0}', PurchaseFailureReason: {1}",product.definition.storeSpecificId, failureReason));
+		nativeAPImanager.instance.ShowAlert(string.Format("Purchase of product: '{0}', Failed: {1}",product.definition.storeSpecificId, failureReason));
 	}
 
-//	string GetProductName(string ID)
-//	{
-////		switch(ID)
-////		{
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////
-////		case(""):
-////			{
-////				return "";
-////			}
-////			break;
-////
-////		default:
-////			return "failed"; 
-////			break;
-////		}
-//	}
 }
 

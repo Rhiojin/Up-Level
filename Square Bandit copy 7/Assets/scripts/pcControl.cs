@@ -70,6 +70,7 @@ public class pcControl : MonoBehaviour {
 
 	Touch touch;
 	bool touchMoved = false;
+	bool inputRegistered = false;
 	Vector2 touchStart = Vector2.zero;
 	Vector2 touchCurrent = Vector2.zero;
 	Vector2 swipeDistance = Vector2.zero;
@@ -92,6 +93,7 @@ public class pcControl : MonoBehaviour {
 	public Transform particlePosTop;
 	public Transform particePosFront;
 
+	Transform respawnTransform = null;
 
 
 	void Start () 
@@ -273,6 +275,7 @@ public class pcControl : MonoBehaviour {
 			if(touch.phase == TouchPhase.Began)
 			{
 				touchMoved = false;
+				inputRegistered = false;
 				touchStart = touch.position;
 
 			}
@@ -283,19 +286,49 @@ public class pcControl : MonoBehaviour {
 				{
 //					touchMoved = true;
 					touchCurrent = touch.position;
-					if(Vector2.Distance(touchStart, touchCurrent) > 10) touchMoved = true;
+					if(!touchMoved && Vector2.Distance(touchStart, touchCurrent) > 10) 
+					{
+						touchMoved = true;
+						inputRegistered = true;
 
-//					if(Vector2.Distance(touchCurrent, touchStart) > 10)
-//					{
-						
+						Vector2 v = touchCurrent - touchStart;
+						if(Mathf.Abs(v.x) > Mathf.Abs(v.y))
+						{
+							if(touchCurrent.x > touchStart.x) 
+							{
+								if(isFacingRight && !weightless)
+								{
+									if(!ShoulderBashing)StartCoroutine( ShoulderBash() );
+								}
+								else
+								{
+									SwapTravelDirection();
+								}
+							}
+							else
+							{
+								if(!isFacingRight)
+								{
+									if(!ShoulderBashing) StartCoroutine( ShoulderBash() );
+								}
+								else
+								{
+									SwapTravelDirection();
+								}
+							}
+						}
+						else
+						{
+							if(!ButtStomping && !canJump) StartCoroutine( ButtStomp() );
+						}
+					}
 
-//					}
 				}
 			}
 
 			if(touch.phase == TouchPhase.Ended)
 			{
-				if(touchMoved == false)
+				if(touchMoved == false && !inputRegistered)
 				{
 
 					if(!donkeyCannoning)
@@ -324,47 +357,42 @@ public class pcControl : MonoBehaviour {
 
 				}
 
-				else
-				{
-//					if(Vector2.Distance(touchStart, touchCurrent) > 3)
+//				else
+//				{
+//					Vector2 v = touchCurrent - touchStart;
+//					if(Mathf.Abs(v.x) > Mathf.Abs(v.y))
 //					{
-					Vector2 v = touchCurrent - touchStart;
-					if(Mathf.Abs(v.x) > Mathf.Abs(v.y))
-//						if(Mathf.Abs(touchCurrent.x) > Mathf.Abs(touchStart.y))
-						{
-							if(touchCurrent.x > touchStart.x) 
-							{
-								if(isFacingRight && Mathf.Abs(touchCurrent.x - touchStart.x) > 5)
-								{
-									if(!ShoulderBashing)StartCoroutine( ShoulderBash() );
-								}
-								else
-								{
-									SwapTravelDirection();
-								}
-							}
-							else
-							{
-								if(!isFacingRight && Mathf.Abs(touchCurrent.x - touchStart.x) > 5)
-								{
-									if(!ShoulderBashing) StartCoroutine( ShoulderBash() );
-								}
-								else
-								{
-									SwapTravelDirection();
-								}
-							}
-						}
-						else
-						{
-						if(!ButtStomping && !canJump && Mathf.Abs(touchCurrent.y - touchStart.y) > 10) StartCoroutine( ButtStomp() );
-						}
-					}
-
+//						if(touchCurrent.x > touchStart.x) 
+//						{
+//							if(isFacingRight && Mathf.Abs(touchCurrent.x - touchStart.x) > 5)
+//							{
+//								if(!ShoulderBashing)StartCoroutine( ShoulderBash() );
+//							}
+//							else
+//							{
+//								SwapTravelDirection();
+//							}
+//						}
+//						else
+//						{
+//							if(!isFacingRight && Mathf.Abs(touchCurrent.x - touchStart.x) > 5)
+//							{
+//								if(!ShoulderBashing) StartCoroutine( ShoulderBash() );
+//							}
+//							else
+//							{
+//								SwapTravelDirection();
+//							}
+//						}
+//					}
+//					else
+//					{
+//					if(!ButtStomping && !canJump && Mathf.Abs(touchCurrent.y - touchStart.y) > 10) StartCoroutine( ButtStomp() );
+//					}
 //				}
+
 			}
 		}
-//
 
 
 		#endif
@@ -606,22 +634,58 @@ public class pcControl : MonoBehaviour {
 	void Death()
 	{
 		dead = true;
-		stompParticle.transform.parent = null;
+
 		stompParticle.Emit(10);
 		stompParticle.Stop();	
-		levelScript.GameOver();
+
+		//CHANGE DEATH TO BE LIKE HHN
+		//play death animation
+		if((PlayerPrefs.GetInt("coins",0) >= 100 || AdManager.AdColony_AdAvailable())&& respawnTransform != null)
+		{
+			levelScript.ShowRespawnMenu();
+		}
+
+		else 
+		{
+//			stompParticle.transform.parent = null;
+			levelScript.GameOver();
+		}
 	}
 
+
+
+	void SaveForRespawn(Transform t)
+	{
+		respawnTransform = t;
+	}
+
+	public void Respawn()
+	{
+		StartCoroutine( ActualRespawn() );
+	}
+
+	IEnumerator ActualRespawn()
+	{
+		yield return new WaitForSeconds(1);
+		transform.position = respawnTransform.position+Vector3.up*3;
+		anim.Play("pc_Run");
+		dead = false;
+	}
+
+	public void DontRespawn()
+	{
+		levelScript.GameOver();
+	}
 
 	void OnCollisionEnter2D(Collision2D colEnt)
 	{
 		if(colEnt.collider.CompareTag("ground"))
 		{
 			if(ButtStomping) camScript.StartCamRock(transform.position.x);
-//			else if(RocketBoosting) camScript.StartScreenShake();
 			if(!canJump && !weightless || ShoulderBashing)
 			{
 				anim.Play("pc_Run");
+				SaveForRespawn(colEnt.transform);
 			}
 			canJump = true;
 			RocketBoosting = false;

@@ -9,7 +9,7 @@ public class camControl : MonoBehaviour {
 //	float minHeight = 3f;
 //	float maxHeight = 20;
 	float lerpSpeed = 2;
-	float yOffset = 8;
+	float yOffset = 15;
 	float xClamp = 8; //was 20
 
 //	float baseOrthoSize = 7.5f;
@@ -38,7 +38,7 @@ public class camControl : MonoBehaviour {
 	Camera thisCam;
 	Transform soundManagerObj;
 
-	//	public levelManager levelScript;
+	float camRockTimeOut = 0;
 
 	void Start () 
 	{
@@ -61,9 +61,9 @@ public class camControl : MonoBehaviour {
 //			targetPos.x = Mathf.Clamp(target.position.x,-xClamp, xClamp);
 			targetPos.y = target.position.y+yOffset;
 //			targetPos.y = Mathf.Clamp(target.position.y,minHeight, maxHeight);
-			if(transform.position.y + yOffset < target.transform.position.y)
+			if(transform.position.y - yOffset < target.transform.position.y)
 			{
-				transform.position = Vector3.Lerp(transform.position, targetPos, lerpSpeed*Time.deltaTime);
+				transform.position = Vector3.Lerp(transform.position, targetPos, lerpSpeed*0.35f*Time.deltaTime);
 			}
 
 			//updagte zoom to contain pc and objects as much as possible
@@ -84,12 +84,14 @@ public class camControl : MonoBehaviour {
 			rockRotation.z = Mathf.MoveTowards(rockRotation.z, 0, 50*Time.deltaTime);
 			transform.eulerAngles = rockRotation;
 			transform.position = Vector3.Lerp(transform.position, originalPos, lerpSpeed*2*Time.deltaTime);
+			camRockTimeOut += Time.deltaTime;
 
-			if( Mathf.Abs( transform.position.y - originalPos.y) < 1)
+			if( Mathf.Abs( transform.position.y - originalPos.y) < 1.2f || camRockTimeOut >= 2)
 			{
 				transform.eulerAngles = zeroVector;
 				transform.position = originalPos;
 				camRock = false;
+				camRockTimeOut = 0;
 			}
 		}
 

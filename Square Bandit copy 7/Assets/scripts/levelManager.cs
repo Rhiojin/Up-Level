@@ -27,10 +27,6 @@ public class levelManager : MonoBehaviour {
 	public GameObject mainMenuPanel;
 	public GameObject gameOverPanel;
 
-	public SpriteRenderer Sky;
-	public Color[] skyColors;
-	int skyColorIndex = 0;
-
 	public int score;
 	public Text scoreDisplay;
 	public Text gameOverScoreDisplay;
@@ -54,6 +50,7 @@ public class levelManager : MonoBehaviour {
 	public CanvasGroup InGameGroup;
 	public CanvasGroup gameOverGroup;
 	public CanvasGroup pauseMenuGroup;
+	public CanvasGroup respawnGroup;
 	public MenuManager menuScript;
 	public FCTCanvas fctCanvasScript;
 	public Text coinsText;
@@ -62,6 +59,9 @@ public class levelManager : MonoBehaviour {
 	public CanvasGroup ingameCoinDisplayGroup;
 	public Text ingameCoinDisplay;
 
+	public GameObject vidAdRespawnButton;
+	public GameObject coinRespawnButton;
+
 	float fadeTime = 2;
 
 	void Start () 
@@ -69,6 +69,8 @@ public class levelManager : MonoBehaviour {
 		pcScript = pc.GetComponent<pcControl>();
 		transistionCanvas.instance.StartTransitionOut();
 		ingameCoinDisplay.text = PlayerPrefs.GetInt("coins",0).ToString();
+
+		AdManager._Adcolony_didFinishVideo += OnVideoWatched;
 	}
 	
 	// Update is called once per frame
@@ -100,16 +102,9 @@ public class levelManager : MonoBehaviour {
 		paused = !paused;
 	}
 
-	void UpdateSky()
+	public void WatchVideoAd()
 	{
-//		Sky.color = Color.Lerp(Sky.color, skyColors[skyColorIndex], 0.02f*Time.deltaTime);
-
-	}
-
-	void ColorCheck()
-	{
-		if(Mathf.Approximately(Sky.color.r, skyColors[skyColorIndex].r)) skyColorIndex++;
-		if(skyColorIndex >= skyColors.Length) skyColorIndex = 0;
+		AdManager.AdColony_PlayVideoAd();
 	}
 
 	public IEnumerator Flicker(SpriteRenderer sprite)
@@ -145,8 +140,8 @@ public class levelManager : MonoBehaviour {
 
 	void SetCoinsDisplay(int amount)
 	{
-		coinsText.text = amount.ToString();
-		coinsTextStore.text = coinsText.text;
+		if(coinsText)coinsText.text = amount.ToString();
+		if(coinsTextStore)coinsTextStore.text = coinsText.text;
 	}
 
 	public void MakeACoin(Vector3 position)
@@ -241,6 +236,9 @@ public class levelManager : MonoBehaviour {
 		dead = true;
 		pc.SetActive(false);
 		lastPcPoint = pc.transform.position;
+
+		// if lastLandSpot is within camera area, give respawn option
+
 		StartCoroutine( menuScript.FadeDelay() );
 
 		int hs = PlayerPrefs.GetInt("highscore",0);
@@ -252,109 +250,60 @@ public class levelManager : MonoBehaviour {
 		PlayerPrefs.SetInt("lastscore", score);
 
 	}
-//
-//	IEnumerator FadeDelay()
-//	{
-//		yield return new WaitForSeconds(0.5f);
-//		InvokeRepeating("InGameUIFadeOut",0.01f, 0.02f);
-//		InvokeRepeating("GameOverUIFadeIn",0.01f, 0.02f);
-//
-//	}
-//
-//	public void Load()
-//	{
-//		SceneManager.LoadScene("levelScene");
-//	}
-//
-//	void FadeOut()
-//	{
-//		if(mainMenuGroup.alpha > 0)
-//		{
-//			mainMenuGroup.alpha -=Time.deltaTime*fadeTime;
-//			if(mainMenuGroup.alpha <= 0) 
-//			{
-//				mainMenuPanel.SetActive(false);
-//				CancelInvoke("FadeOut");
-//			}
-//		}
-//	}
-//
-//	void GameOverUIFadeIn()
-//	{
-//		if(gameOverGroup.interactable == false)gameOverGroup.interactable = true;
-//		if(gameOverGroup.alpha < 1)
-//		{
-//			gameOverGroup.alpha +=Time.deltaTime*fadeTime;
-//			if(gameOverGroup.alpha >= 1) 
-//			{
-//				
-//				gameOverGroup.blocksRaycasts = true;
-//				CancelInvoke("GameOverUIFadeIn");
-//			}
-//		}
-//	}
-//
-//	void InGameUIFadeOut()
-//	{
-//		if(InGameGroup.alpha > 0)
-//		{
-//			InGameGroup.alpha -=Time.deltaTime*fadeTime;
-//			if(InGameGroup.alpha <= 0) 
-//			{
-//				print("fac");
-//				InGameGroup.interactable = false;
-//				InGameGroup.blocksRaycasts = false;
-//				CancelInvoke("InGameUIFadeOut");
-//			}
-//		}
-//	}
-//
-//	void InGameUIFadeIn()
-//	{
-//		if(InGameGroup.alpha < 1)
-//		{
-//			InGameGroup.alpha +=Time.deltaTime*fadeTime;
-//			if(InGameGroup.alpha >= 1) 
-//			{
-//				print("fac1");
-//				InGameGroup.interactable = true;
-//				InGameGroup.blocksRaycasts = true;
-//				CancelInvoke("InGameUIFadeIn");
-//			}
-//		}
-//	}
 
-//	IEnumerator Resets()
-//	{
-//		RunEraser();
-//		yield return new WaitForSeconds(2);
-//		startPlatformHolder = Instantiate(startPlatform, startPlatformStartPos, startPlatform.transform.rotation) as GameObject;
-//		stageMakerScript.Reset();
-//
-//		pc.transform.position = pcStartPos;
-//		pc.SetActive(true);
-//		camScript.targetPos = cameraStartPos;
-//	}
+	public void ShowRespawnMenu()
+	{
+		if(!AdManager.AdColony_AdAvailable())
+		{
+			vidAdRespawnButton.SetActive(false);
+		}
+		if(PlayerPrefs.GetInt("coins",0) < 100)
+		{
+			coinRespawnButton.SetActive(false);
+		}
+		InvokeRepeating("FadeInRespawnMenu",0.01f,0.1f);
+	}
 
-//	void RunEraser()
-//	{
-//		print("aw");
-//		eraser.position = new Vector3(0, -15, 0);
-//		eraserTargetPos.y = lastPcPoint.y + 200;
-//		eraser.gameObject.SetActive(true);
-//		InvokeRepeating("MoveEraser", 0.1f, 0.02f);
-//	}
-//
-//	void MoveEraser()
-//	{
-//		if(eraser.gameObject.activeSelf)
-//			eraser.position = Vector3.MoveTowards(eraser.position, eraserTargetPos, eraserSpeed*Time.deltaTime);
-//		if(eraserTargetPos.y - eraser.position.y < 10)
-//		{
-//			CancelInvoke("MoveEraser");
-//			eraser.gameObject.SetActive(false); 
-//		}
-//	}
+	public void CloseRespawnMenu()
+	{
+		InvokeRepeating("FadeOutRespawnMenu",0.01f,0.1f);
+	}
 
+	public void OnVideoWatched(int cw)
+	{
+		pcScript.Respawn();
+	}
+
+	void FadeInRespawnMenu()
+	{
+		CancelInvoke("FadeOutRespawnMenu");
+		if(respawnGroup.interactable == false)respawnGroup.interactable = true;
+		if(respawnGroup.alpha < 1)
+		{
+			respawnGroup.alpha += 5*Time.deltaTime*fadeTime;
+			if(respawnGroup.alpha >= 1) 
+			{
+
+				respawnGroup.blocksRaycasts = true;
+				CancelInvoke("FadeInPauseMenu");
+			}
+		}
+	}
+
+	void FadeOutRespawnMenu()
+	{
+		CancelInvoke("FadeInRespawnMenu");
+		if(respawnGroup.interactable == true)respawnGroup.interactable = false;
+		if(respawnGroup.alpha > 0)
+		{
+			respawnGroup.alpha -= 5*Time.deltaTime*fadeTime;
+			if(respawnGroup.alpha <= 0) 
+			{
+
+				respawnGroup.blocksRaycasts = true;
+				CancelInvoke("FadeOutPauseMenu");
+			}
+		}
+	}
 
 }

@@ -9,12 +9,7 @@ public class tutorialCanvasGroup : MonoBehaviour {
 	{
 		thisGroup = GetComponent<CanvasGroup>();
 	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-		
-	}
+
 
 	public void StartFadeIn()
 	{

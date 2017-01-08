@@ -63,7 +63,8 @@ public class DynamicLight : MonoBehaviour {
 	
 	// Private variables
 	Mesh lightMesh;													// Mesh for our light mesh
-
+	float refreshRate = 1.5f;
+	float timer = 0;
 
 	// Called at beginning of script execution
 	void Start () {
@@ -92,7 +93,11 @@ public class DynamicLight : MonoBehaviour {
 
 	void Update(){
 
-		getAllMeshes();
+		if(timer <= Time.realtimeSinceStartup) 
+		{
+			getAllMeshes();
+			timer = refreshRate + Time.realtimeSinceStartup;
+		}
 		setLight ();
 		renderLightMesh ();
 		resetBounds ();
@@ -144,7 +149,7 @@ public class DynamicLight : MonoBehaviour {
 		//for (int m = 0; m < 1; m++) {
 			tempVerts.Clear();
 			PolygonCollider2D mf = allMeshes[m];
-
+			if(mf == null) break;
 			// las siguientes variables usadas para arregla bug de ordenamiento cuando
 			// los angulos calcuados se encuentran en cuadrantes mixtos (1 y 4)
 			lows = false; // check si hay menores a -0.5

@@ -229,7 +229,7 @@ public class AdManager : MonoBehaviour {
 			gotReward = true;
 			if(_Adcolony_didFinishVideo != null)
 			{
-				_Adcolony_didFinishVideo(100);
+				_Adcolony_didFinishVideo(90);
 			}
 		}
 	}
@@ -271,7 +271,7 @@ public class AdManager : MonoBehaviour {
 		#endif
 
 		if(AdmobShowOnAwake) Admob_ShowBannerAd();
-		else Admob_HideABannerAd();
+//		else Admob_HideABannerAd();
 		AdmobBannerReady = true;
 
 
@@ -284,13 +284,15 @@ public class AdManager : MonoBehaviour {
 
 		public static void Admob_ShowBannerAd()
 		{
-		print("showing banner ad");
-		bannerView.Show();
+		int b = PlayerPrefs.GetInt("removedAds",0);
+		print("showing banner ad "+b.ToString());
+		if(b == 0) bannerView.Show();
 		}
 
 		public static void Admob_HideABannerAd()
 		{
-		print("hiding banner ad");
+		int b = PlayerPrefs.GetInt("removedAds",0);
+		print("hiding banner ad "+b.ToString());
 		bannerView.Hide();
 		} 
 

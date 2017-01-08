@@ -8,12 +8,23 @@ public class platformDecorator : MonoBehaviour {
 	Vector3 pos;
 	void Start () 
 	{
-		for(int i = 0; i < decorObjects.Length;i++)
+		if(Random.value > 0.8f)
 		{
-			pos = decorObjects[i].localPosition;
-			pos.x = Random.Range(0,14);
-			decorObjects[i].localPosition = pos;
-			decorObjects[i].GetComponent<SpriteRenderer>().color = bg.color;
+			bg.enabled = false;
+			for(int i = 0; i < decorObjects.Length;i++)
+			{
+				decorObjects[i].gameObject.SetActive(false);
+			}
+		}
+		else
+		{
+			for(int i = 0; i < decorObjects.Length;i++)
+			{
+				pos = decorObjects[i].localPosition;
+				pos.x = Random.Range(0,14);
+				decorObjects[i].localPosition = pos;
+				decorObjects[i].GetComponent<SpriteRenderer>().color = bg.color;
+			}
 		}
 	}
 	

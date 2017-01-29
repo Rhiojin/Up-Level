@@ -21,11 +21,15 @@
 /// Resources.
 ///
 
-namespace ll
-{
-public static class GPGSids
+
+public static class GPGSIds
 {
         public const string leaderboard_top_leaps = "CgkIhvOFtIgVEAIQAA"; // <GPGSID>
+        public const string achievement_leaper = "CgkIhvOFtIgVEAIQAQ"; // <GPGSID>
+        public const string achievement_puncher = "CgkIhvOFtIgVEAIQAw"; // <GPGSID>
+        public const string achievement_leap_master = "CgkIhvOFtIgVEAIQBQ"; // <GPGSID>
+        public const string achievement_jumper = "CgkIhvOFtIgVEAIQAg"; // <GPGSID>
+        public const string achievement_stomper = "CgkIhvOFtIgVEAIQBA"; // <GPGSID>
 
 }
-}
+

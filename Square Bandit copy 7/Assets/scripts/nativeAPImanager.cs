@@ -5,6 +5,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine.SocialPlatforms.GameCenter;
 
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+
 public class nativeAPImanager : MonoBehaviour {
 
 	public static nativeAPImanager instance;
@@ -37,9 +40,15 @@ public class nativeAPImanager : MonoBehaviour {
 	private static extern void _ShareToTwitterCard(string _prefillmsg);
 
 	public bool AmazonPlatform = false;
-	public string GooglePlay_leaderboardID;
+
 	string androidPath = "";
 
+	public string GooglePlay_leaderboardID = "CgkIhvOFtIgVEAIQAA";
+	public string ACHIEVE_1 = "CgkIhvOFtIgVEAIQAQ";
+	public string ACHIEVE_2 = "CgkIhvOFtIgVEAIQAg";
+	public string ACHIEVE_3 = "CgkIhvOFtIgVEAIQAw";
+	public string ACHIEVE_4 = "CgkIhvOFtIgVEAIQBA";
+	public string ACHIEVE_5 = "CgkIhvOFtIgVEAIQBQ";
 
 	void Awake()
 	{
@@ -416,7 +425,11 @@ public class nativeAPImanager : MonoBehaviour {
 		}
 		else
 		{
-		Social.localUser.Authenticate(ProcessAuthentication);
+//			PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder();
+//			PlayGamesPlatform.InitializeInstance(config);
+			// Activate the Google Play Games platform
+			PlayGamesPlatform.Activate();
+			Social.localUser.Authenticate(ProcessAuthentication);
 		}
 		#endif
 	}
@@ -439,7 +452,11 @@ public class nativeAPImanager : MonoBehaviour {
 		}
 		else
 		{
-		Social.localUser.Authenticate(ProcessAuthentication);
+//			PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder();
+//			PlayGamesPlatform.InitializeInstance(config);
+			// Activate the Google Play Games platform
+			PlayGamesPlatform.Activate();
+			Social.localUser.Authenticate(ProcessAuthentication);
 		}
 		#endif
 	}
@@ -465,6 +482,11 @@ public class nativeAPImanager : MonoBehaviour {
 	public void GameCenter_Show()
 	{
 		int gc = PlayerPrefs.GetInt("gameCenterAuth",0);
+
+//		#if UNITY_EDITOR
+//		PlayGamesPlatform.Instance.ShowLeaderboardUI(GooglePlay_leaderboardID);
+//		#endif
+			
 		if(gc==0)
 		{
 			Re_AuthenticateGameCenter();
@@ -478,19 +500,19 @@ public class nativeAPImanager : MonoBehaviour {
 				if(AmazonPlatform)
 				{
 
-//				if(AGSClient.IsServiceReady()) {
-//				AGSLeaderboardsClient.ShowLeaderboardsOverlay();
-//				}
-//
-//				else
-//				{
-//				AndroidAlertViewer("Game Circle is currently unavailable");
-//				}
-//
-//				}
-//				else
-//				{
-//				PlayGamesPlatform.Instance.ShowLeaderboardUI(GooglePlay_leaderboardID);
+	//				if(AGSClient.IsServiceReady()) 
+//					{
+	//				AGSLeaderboardsClient.ShowLeaderboardsOverlay();
+//					}
+//					else
+//					{
+//						AndroidAlertViewer("Game Circle is currently unavailable");
+//					}
+				}
+
+				else
+				{
+					PlayGamesPlatform.Instance.ShowLeaderboardUI(GooglePlay_leaderboardID);
 				}
 
 				#endif
@@ -512,22 +534,34 @@ public class nativeAPImanager : MonoBehaviour {
 			#elif UNITY_ANDROID
 			if(AmazonPlatform)
 			{
-//
-//			if(AGSClient.IsServiceReady()) {
-//			AGSLeaderboardsClient.ShowLeaderboardsOverlay();
-//			}
-//			else
-//			{
-//			AndroidAlertViewer("Game Circle is currently unavailable");
-//			}
-//
-//			}
-//			else
-//			{
-//			Social.ShowLeaderboardUI();
+
+//				if(AGSClient.IsServiceReady()) {
+//				AGSLeaderboardsClient.ShowLeaderboardsOverlay();
+//				}
+//					else
+//					{
+//						AndroidAlertViewer("Game Circle is currently unavailable");
+//					}
+			}
+			else
+			{
+				PlayGamesPlatform.Instance.ShowLeaderboardUI(GooglePlay_leaderboardID);
 			}
 
 			#endif
 		}
+	}
+
+	public void GetAchievement(string achievement)
+	{
+		#if UNITY_ANDROID
+		if(!AmazonPlatform)
+		{
+			Social.ReportProgress(achievement, 100.0f, (bool success) => {
+				print("achievement report " + success);
+			});
+
+		}
+		#endif
 	}
 }

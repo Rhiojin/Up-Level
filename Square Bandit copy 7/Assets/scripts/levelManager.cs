@@ -204,6 +204,7 @@ public class levelManager : MonoBehaviour {
 
 		// if lastLandSpot is within camera area, give respawn option
 
+		CheckAchievments();
 		StartCoroutine( menuScript.FadeDelay() );
 
 		int hs = PlayerPrefs.GetInt("highscore",0);
@@ -214,6 +215,7 @@ public class levelManager : MonoBehaviour {
 
 		PlayerPrefs.SetInt("lastscore", score);
 		UnRegisterForAdWatch();
+
 	}
 
 	IEnumerator TurnOffPC()
@@ -292,4 +294,36 @@ public class levelManager : MonoBehaviour {
 		AdManager._Adcolony_didFinishVideo -= OnVideoWatched;
 	}
 
+	void CheckAchievments()
+	{
+		if(score >= 100 && PlayerPrefs.GetInt(nativeAPImanager.instance.ACHIEVE_1,0) == 0)
+		{
+			PlayerPrefs.SetInt(nativeAPImanager.instance.ACHIEVE_1,1);
+			nativeAPImanager.instance.GetAchievement(nativeAPImanager.instance.ACHIEVE_1);
+		}
+
+		if(score >= 200 && PlayerPrefs.GetInt(nativeAPImanager.instance.ACHIEVE_2,0) == 0)
+		{
+			PlayerPrefs.SetInt(nativeAPImanager.instance.ACHIEVE_2,1);
+			nativeAPImanager.instance.GetAchievement(nativeAPImanager.instance.ACHIEVE_2);
+		}
+
+		if(score >= 300 && PlayerPrefs.GetInt(nativeAPImanager.instance.ACHIEVE_3,0) == 0)
+		{
+			PlayerPrefs.SetInt(nativeAPImanager.instance.ACHIEVE_3,1);
+			nativeAPImanager.instance.GetAchievement(nativeAPImanager.instance.ACHIEVE_3);
+		}
+
+		if(score >= 400 && PlayerPrefs.GetInt(nativeAPImanager.instance.ACHIEVE_4,0) == 0)
+		{
+			PlayerPrefs.SetInt(nativeAPImanager.instance.ACHIEVE_4,1);
+			nativeAPImanager.instance.GetAchievement(nativeAPImanager.instance.ACHIEVE_4);
+		}
+
+		if(score >= 500 && PlayerPrefs.GetInt(nativeAPImanager.instance.ACHIEVE_5,0) == 0)
+		{
+			PlayerPrefs.SetInt(nativeAPImanager.instance.ACHIEVE_5,1);
+			nativeAPImanager.instance.GetAchievement(nativeAPImanager.instance.ACHIEVE_5);
+		}
+	}
 }

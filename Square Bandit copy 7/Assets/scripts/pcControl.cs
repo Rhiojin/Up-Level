@@ -665,7 +665,7 @@ public class pcControl : MonoBehaviour {
 		anim.Play("pc_death");
 
 		yield return new WaitForSeconds(1);
-		if((PlayerPrefs.GetInt("coins",0) >= 100 || AdManager.AdColony_AdAvailable())&& respawnTransform != null && !respawned)
+		if((PlayerPrefs.GetInt("coins",0) >= 100 || AdManager.AdColony_AdAvailable())&& respawnTransform != null && !respawned && respawnTransform != null)
 		{
 			respawned = true;
 			levelScript.ShowRespawnMenu();
@@ -777,7 +777,12 @@ public class pcControl : MonoBehaviour {
 				ButtStomping = false;
 				//RocketBoosting = false;
 				//rocketParticle.Stop();
-				Destroy(colEnt.collider.gameObject);
+				if(colEnt.collider.transform.parent)
+				{
+					Destroy(colEnt.collider.transform.parent);
+				}
+				else
+					Destroy(colEnt.collider.gameObject);
 				if(!ShoulderBashing)
 				{
 					thisRigidbody.velocity = zeroVector;

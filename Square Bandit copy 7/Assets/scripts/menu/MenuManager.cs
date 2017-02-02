@@ -290,7 +290,12 @@ public class MenuManager : MonoBehaviour {
 		}
 		else
 		{
-			print("priceblocker not targeting correct skin");
+			if(name == "viking")
+			{
+				pcScript.UpdateSkin(name);
+				StartCoroutine( UpdateSocialSkin(name) );
+			}
+			else print("priceblocker not targeting correct skin");
 		}
 
 	}

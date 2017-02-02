@@ -1142,6 +1142,7 @@ namespace GooglePlayGames
         {
             if (leaderboardId != null)
             {
+				Debug.Log("attempting to show leaderboard");
                 leaderboardId = MapId(leaderboardId);
             }
 
